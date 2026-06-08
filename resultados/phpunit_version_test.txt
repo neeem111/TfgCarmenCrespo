@@ -1,0 +1,38 @@
+Moodle 4.3.3 (Build: 20240212)
+Php: 8.2.30, mariadb: 11.3.2, OS: Linux 6.8.0-100-generic x86_64
+PHPUnit 9.5.28 by Sebastian Bergmann and contributors.
+
+mod_sqlab_version_test
+ ✔ Plugin is installed
+ ✔ Version file has required fields
+ ✘ Can create sqlab instance
+   │
+   │ coding_exception: Coding error detected, it must be fixed by a programmer: Component mod_sqlab does not support generators yet. Missing tests/generator/lib.php.
+   │
+   │ /var/www/html/lib/testing/generator/data_generator.php:1528
+   │ /var/www/html/lib/testing/generator/data_generator.php:132
+   │ /var/www/html/lib/testing/generator/data_generator.php:502
+   │ /var/www/html/mod/sqlab/tests/mod_sqlab_version_test.php:72
+   │ /var/www/html/lib/phpunit/classes/advanced_testcase.php:81
+   │
+
+ ✔ Database table exists
+
+Time: 00:00.190, Memory: 66.50 MB
+
+Summary of non-successful tests:
+
+mod_sqlab_version_test
+ ✘ Can create sqlab instance
+   │
+   │ coding_exception: Coding error detected, it must be fixed by a programmer: Component mod_sqlab does not support generators yet. Missing tests/generator/lib.php.
+   │
+   │ /var/www/html/lib/testing/generator/data_generator.php:1528
+   │ /var/www/html/lib/testing/generator/data_generator.php:132
+   │ /var/www/html/lib/testing/generator/data_generator.php:502
+   │ /var/www/html/mod/sqlab/tests/mod_sqlab_version_test.php:72
+   │ /var/www/html/lib/phpunit/classes/advanced_testcase.php:81
+   │
+
+ERRORS!
+Tests: 4, Assertions: 7, Errors: 1.
