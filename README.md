@@ -1,28 +1,36 @@
-# TfgCarmenCrespo
 # TFG — Requisitos de calidad software para la publicación de plugins en Moodle
 
-> **Autora:** Carmen Crespo Navarro  
-> **Tutor:** Jesús Damián García-Consuegra Bleda  
-> **Universidad:** Universidad de Castilla-La Mancha — Escuela Superior de Ingeniería Informática  
-> **Titulación:** Grado en Ingeniería Informática (Tecnologías de la Información)  
-> **Curso:** 2025–2026  
+> **Autora:** Carmen Crespo Navarro
+> **Tutor:** Jesús Damián García-Consuegra Bleda
+> **Universidad:** Universidad de Castilla-La Mancha — Escuela Superior de Ingeniería Informática
+> **Titulación:** Grado en Ingeniería Informática (Tecnologías de la Información)
+> **Curso:** 2025–2026
 
+---
 
 ## ¿De qué trata este repositorio?
 
-Este repositorio contiene las pruebas desarrollados en el Trabajo Fin de Grado cuyo objetivo es **analizar los requisitos de calidad software exigidos por Moodle para la publicación de plugins y aplicarlos sobre el plugin mod_sqlab**.
+Este repositorio contiene los artefactos de prueba desarrollados en el Trabajo Fin de Grado cuyo objetivo es **analizar los requisitos de calidad software exigidos por Moodle para la publicación de plugins y aplicarlos sobre el plugin `mod_sqlab`**.
 
-El trabajo propone una metodología de evaluación reproducible basada íntegramente en las herramientas del ecosistema oficial de Moodle (PHPUnit, Behat, Selenium, phpcs, phplint), aplicable a cualquier plugin de tipo *módulo de actividad*.
+El trabajo propone una metodología de evaluación reproducible basada en las herramientas del ecosistema oficial de Moodle (phplint, phpcs, PHPUnit) y, para la validación funcional, en **Selenium WebDriver**, aplicable a cualquier plugin de tipo *módulo de actividad*.
+
+La validación funcional se diseñó inicialmente con Behat, pero la ausencia del generador de datos del plugin (`tests/generator/lib.php`) y la imposibilidad de Behat de simular dos usuarios simultáneos llevaron a ejecutarla con **Selenium**, lanzado en remoto contra el servidor de despliegue del tutor a través de VPN. Los ficheros Behat se conservan como diseño de referencia. El detalle de esta decisión está en el Capítulo 5 de la memoria.
+
+---
 
 ## Estructura del repositorio
+
+```
 TfgCarmenCrespo/
-├── README.md                          ← Este fichero
+├── README.md
 ├── tests/
-│   ├── mod_sqlab_version_test.php     ← UNI-02: Instalación, version.php, instanciación
-│   ├── mod_sqlab_privacy_test.php     ← UNI-03: Privacy API
-│   ├── mod_sqlab_backup_test.php      ← UNI-04: Backup & Restore API
-│   ├── mod_sqlab_structure_test.php   ← UNI-05: Estructura de ficheros obligatorios
-│   ├── behat/
+│   ├── phpunit/                                  ← Suites PHPUnit (UNI-02 a UNI-06)
+│   │   ├── mod_sqlab_version_test.php            ← UNI-02: instalación, version.php, instanciación
+│   │   ├── mod_sqlab_privacy_test.php            ← UNI-03: Privacy API
+│   │   ├── mod_sqlab_backup_test.php             ← UNI-04: Backup & Restore API
+│   │   ├── mod_sqlab_structure_test.php          ← UNI-05: estructura de ficheros y seguridad
+│   │   └── mod_sqlab_integration_test_v2.php     ← UNI-06: lógica de ejecución de consultas SQL
+│   ├── behat/                                    ← Escenarios Behat (DISEÑO, no ejecutados)
 │   │   ├── FUN-01_sqlab_acceso_actividad.feature
 │   │   ├── FUN-02_sqlab_acceso_actividad_sqlab.feature
 │   │   ├── FUN-03_sqlab_instalacion.feature
@@ -30,56 +38,84 @@ TfgCarmenCrespo/
 │   │   ├── FUN-05_admin_sqlab_crear_actividad.feature
 │   │   ├── FUN-06_student_consulta_sqlab_feedback.feature
 │   │   ├── FUN-07_sqlab_navegacion_preguntas.feature
-│   │   └── FUN-08_sqlab_puntuacion.feature
-│   └── generator/
-│       └── lib.php                    ← Generador de datos para Behat
+│   │   ├── FUN-08_sqlab_puntuacion.feature
+│   │   ├── FUN-09_sqlab_diccionario_datos.feature
+│   │   └── FUN-10_sqlab_entorno_colaborativo.feature
+│   └── selenium/                                 ← Validación funcional REAL (FUN-01..10, FUN-12)
+│       ├── selenium_FUN01.py
+│       ├── selenium_FUN02.py
+│       ├── selenium_FUN03.py
+│       ├── selenium_FUN04.py
+│       ├── selenium_FUN05.py
+│       ├── selenium_FUN06.py
+│       ├── selenium_FUN07.py
+│       ├── selenium_FUN08.py
+│       ├── selenium_FUN09.py
+│       ├── selenium_FUN10.py
+│       ├── selenium_FUN12.py
+│       └── chromedriver.exe
 └── resultados/
-    ├── fichas_behat_FUN01_FUN08.md    ← Fichas documentadas de los 21 escenarios Behat
-    ├── fichas_phpunit_UNI02_UNI05.md  ← Fichas documentadas de los 16 métodos PHPUnit
-    ├── phpunit_output.txt             ← Salida de ejecución PHPUnit (servidor tutor)
-    ├── behat_output.txt               ← Salida de ejecución Behat (servidor tutor)
-    ├── phpcs_output.txt               ← Salida de phpcs (servidor tutor)
-    └── capturas/                      ← Capturas de pantalla de la ejecución
+    ├── estaticas/
+    │   ├── syntax_check.log                      ← Salida de phplint (php -l) sobre el plugin
+    │   └── resultado_phpcs.txt                   ← Salida de phpcs (estándar moodle-cs)
+    └── phpunit/
+        └── phpunit_definitivo_20260615.txt       ← Salida PHPUnit (servidor del tutor, UNI-02..06)
+```
 
-## Entorno de pruebas
+> **Nota.** El plugin `mod_sqlab` **no** incluye el fichero `tests/generator/lib.php`. El generador de datos es infraestructura de pruebas cuya implementación corresponde al desarrollador del plugin; su ausencia se documenta en la memoria como un hallazgo de la evaluación, no se suple en este trabajo.
 
-Las pruebas están diseñadas para ejecutarse sobre **moodle-docker** (repositorio oficial de MoodleHQ), que proporciona todos los servicios necesarios en contenedores Docker:
-
-## Requisitos previos
-
-- Docker instalado en el servidor
-- Repositorio [moodle-docker](https://github.com/moodlehq/moodle-docker) clonado y configurado
-- Plugin mod_sqlab instalado en la instancia de Moodle
-- Los ficheros de tests/ copiados en mod/sqlab/tests/ dentro de la instalación de Moodle
+---
 
 ## Cobertura de pruebas
 
-### PHPUnit (16 métodos)
+### Validación estática
 
-| Suite | ID | Requisito verificado |
-|---|---|---|
-| UNI-02 | a–d | Instalación, `version.php`, Frankenstyle, tabla BD |
-| UNI-03 | a–c | Privacy API (approval blocker si falta) |
-| UNI-04 | a–c | Backup & Restore API (approval blocker si falta) |
-| UNI-05 | a–f | Estructura ficheros, `lib.php`, seguridad, idioma |
+| Prueba | Herramienta | Alcance | Resultado registrado |
+|---|---|---|---|
+| SIN-01 | phplint (`php -l`) | Todos los ficheros PHP del plugin | 2 errores fatales (`moodle_interface.php`, `sqldb_manager.php`); el resto sin errores de sintaxis |
+| EST-01 | phpcs (estándar `moodle-cs`) | Ficheros de `classes/` | 507 errores y 77 *warnings* en 5 ficheros — no superada |
 
-### Behat (21 escenarios)
+### Validación unitaria (PHPUnit)
 
-| Feature | Escenarios | Cubre |
-|---|---|---|
-| FUN-01 | 3 | Acceso al curso, roles, capabilities |
-| FUN-02 | 2 | Acceso a la actividad SQLab |
-| FUN-03 | 3 | Instalación y ausencia de errores PHP |
-| FUN-04 | 3 | Enunciado, resultado esperado, editor SQL |
-| FUN-05 | 1 | Creación de actividad por el admin |
-| FUN-06 | 3 | Ejecución de consultas y feedback |
-| FUN-07 | 3 | Navegación entre preguntas |
-| FUN-08 | 3 | Visualización de puntuación |
+| Suite | Fichero | Requisito verificado | Resultado registrado |
+|---|---|---|---|
+| UNI-02 | `mod_sqlab_version_test.php` | Instalación, `version.php`, tabla BD, instanciación | 5 PASS, 1 *skipped* (instanciación sin generador) |
+| UNI-03 | `mod_sqlab_privacy_test.php` | Privacy API | 5 PASS |
+| UNI-04 | `mod_sqlab_backup_test.php` | Backup & Restore API (*approval blocker*) | 3 FAIL, 2 *skipped* |
+| UNI-05 | `mod_sqlab_structure_test.php` | Estructura de ficheros y seguridad | 4 PASS, 2 FAIL (`upgrade.php`, `required_param()`) |
+| UNI-06 | `mod_sqlab_integration_test_v2.php` | Lógica de ejecución de consultas SQL | 2 PASS, 2 *skipped* (requieren PostgreSQL externo) |
 
-## Notas de adaptación para el plugin definitivo
+### Validación funcional (Selenium — FUN-01 a FUN-10 y FUN-12)
 
-Algunos escenarios Behat contienen valores que pueden necesitar ajuste en el plugin final. Consultar los comentarios `# NOTA PARA EL TUTOR:` en cada fichero `.feature` y la Sección III.9.2 del Anexo III de la memoria.
+| Script | FUN | Casos de uso | Escenarios | Usuarios |
+|---|---|---|---|---|
+| `selenium_FUN01.py` | FUN-01 | CU-00, CU-07 | Acceso al curso · profesor activa edición · estudiante no edita | student1, carmenprof |
+| `selenium_FUN02.py` | FUN-02 | CU-01 | Actividad visible · abrir sin errores PHP | student1 |
+| `selenium_FUN03.py` | FUN-03 | Instalación | Plugin en módulos · sin errores PHP · habilitado | admin |
+| `selenium_FUN04.py` | FUN-04 | CU-02 | Enunciado · resultados esperados · editor SQL | student1 |
+| `selenium_FUN05.py` | FUN-05 | CU-08 | SQLab en el selector · campos del formulario | carmenprof |
+| `selenium_FUN06.py` | FUN-06 | CU-03, CU-04 | Ejecutar · evaluar · SQL inválido sin error PHP | student1 |
+| `selenium_FUN07.py` | FUN-07 | CU-05 | Sidebar P1/P2 · avanzar · volver | student1 |
+| `selenium_FUN08.py` | FUN-08 | CU-06 | «Puntúa como» · evaluar · SQL inválido | student1 |
+| `selenium_FUN09.py` | FUN-09 | CU-09 | Botón diccionario · menú sin error · snippet en editor | student1 |
+| `selenium_FUN10.py` | FUN-10 | CU-10, CU-11, CU-12 | Elementos colaborativos (1 usuario) · dos usuarios simultáneos | student1, student2 |
+| `selenium_FUN12.py` | FUN-12 | Integral | Flujo colaborativo completo entre dos usuarios | student1, student2 |
 
-## Licencia
 
-Las pruebas desarrolladas en este trabajo se distribuyen bajo los términos de la [GNU General Public License v3](https://www.gnu.org/licenses/gpl-3.0.html), en consonancia con los requisitos de licenciamiento del ecosistema Moodle.
+## Datos del entorno de ejecución de Selenium
+
+| Parámetro | Valor |
+|---|---|
+| URL base de Moodle | `https://moodle.repobcam.i3a.uclm.es:10443` |
+| Curso de prueba | «bbdd» — `course id = 2` |
+| Actividad SQLab | `course module id = 5` (`/mod/sqlab/view.php?id=5`) |
+| Usuarios | `student1`, `student2`, `carmenprof`, `admin` |
+
+
+## Resultados
+
+Las salidas de la ejecución sobre el plugin se encuentran en la carpeta `resultados/`:
+
+- `resultados/estaticas/syntax_check.log` — salida de phplint.
+- `resultados/estaticas/resultado_phpcs.txt` — salida de phpcs.
+- `resultados/phpunit/phpunit_definitivo_20260615.txt` — salida de las suites UNI-02 a UNI-06 ejecutadas.
