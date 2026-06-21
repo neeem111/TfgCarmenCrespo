@@ -1,0 +1,1 @@
+bash: line 1: vendor/bin/phpcs: No such file or directory

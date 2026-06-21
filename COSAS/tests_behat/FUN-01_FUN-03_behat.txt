@@ -1,0 +1,150 @@
+[36m@mod @mod_sqlab[39m
+[1mFeature:[22m FUN-01 Estudiante accede a una actividad SQLab desde el curso
+
+  [1mBackground:[22m                                    [30m# /var/www/html/mod/sqlab/tests/behat/FUN-01_sqlab_acceso_actividad.feature:4[39m
+    [32mGiven the following "[39m[32;1mcourses[39;22m[32m" exist:[39m         [30m# behat_data_generators::the_following_entities_exist()[39m
+[32m      | fullname      | shortname | category |
+      | Base de Datos | BBDD      | 0        |[39m
+    [32mAnd the following "[39m[32;1musers[39;22m[32m" exist:[39m             [30m# behat_data_generators::the_following_entities_exist()[39m
+[32m      | username | firstname | lastname | email                |
+      | student1 | Student   | One      | student1@example.com |[39m
+    [32mAnd the following "[39m[32;1mcourse enrolments[39;22m[32m" exist:[39m [30m# behat_data_generators::the_following_entities_exist()[39m
+[32m      | user     | course | role    |
+      | student1 | BBDD   | student |[39m
+      │ ++ Exception encountered in event observer '\mod_sqlab\observer::handle_role_assigned': Warning: pg_connect(): Unable to connect to PostgreSQL server: could not translate host name "postgres" to address: Temporary failure in name resolution in /var/www/html/mod/sqlab/classes/dbconnector.php line 45 ++
+      │ * line ? of unknownfile: call to Behat\Testwork\Call\Handler\RuntimeCallHandler->handleError()
+      │ * line 45 of /mod/sqlab/classes/dbconnector.php: call to pg_connect()
+      │ * line 179 of /mod/sqlab/classes/database_manager.php: call to mod_sqlab\dbconnector->connect()
+      │ * line 62 of /mod/sqlab/classes/database_manager.php: call to mod_sqlab\database_manager::check_database_exists()
+      │ * line 16 of /mod/sqlab/classes/observer.php: call to mod_sqlab\database_manager::handle_role_assignment()
+      │ * line ? of unknownfile: call to mod_sqlab\observer::handle_role_assigned()
+      │ * line 155 of /lib/classes/event/manager.php: call to call_user_func()
+      │ * line 75 of /lib/classes/event/manager.php: call to core\event\manager::process_buffers()
+      │ * line 795 of /lib/classes/event/base.php: call to core\event\manager::dispatch()
+      │ * line 1680 of /lib/accesslib.php: call to core\event\base->trigger()
+      │ * line 2164 of /lib/enrollib.php: call to role_assign()
+      │ * line 1032 of /lib/testing/generator/data_generator.php: call to enrol_plugin->enrol_user()
+      │ * line 631 of /lib/behat/classes/behat_core_generator.php: call to testing_data_generator->enrol_user()
+      │ * line 266 of /lib/behat/classes/behat_generator_base.php: call to behat_core_generator->process_enrol_user()
+      │ * line 92 of /lib/tests/behat/behat_data_generators.php: call to behat_generator_base->generate_items()
+      │ * line 110 of /vendor/behat/behat/src/Behat/Testwork/Call/Handler/RuntimeCallHandler.php: call to behat_data_generators->the_following_entities_exist()
+      │ * line 64 of /vendor/behat/behat/src/Behat/Testwork/Call/Handler/RuntimeCallHandler.php: call to Behat\Testwork\Call\Handler\RuntimeCallHandler->executeCall()
+      │ * line 138 of /vendor/behat/behat/src/Behat/Testwork/Call/CallCenter.php: call to Behat\Testwork\Call\Handler\RuntimeCallHandler->handleCall()
+      │ * line 96 of /vendor/behat/behat/src/Behat/Testwork/Call/CallCenter.php: call to Behat\Testwork\Call\CallCenter->handleCall()
+      │ * line 125 of /vendor/behat/behat/src/Behat/Behat/Tester/Runtime/RuntimeStepTester.php: call to Behat\Testwork\Call\CallCenter->makeCall()
+      │ * line 73 of /vendor/behat/behat/src/Behat/Behat/Tester/Runtime/RuntimeStepTester.php: call to Behat\Behat\Tester\Runtime\RuntimeStepTester->testDefinition()
+      │ * line 74 of /vendor/behat/behat/src/Behat/Behat/Hook/Tester/HookableStepTester.php: call to Behat\Behat\Tester\Runtime\RuntimeStepTester->test()
+      │ * line 110 of /lib/behat/extension/Moodle/BehatExtension/EventDispatcher/Tester/ChainedStepTester.php: call to Behat\Behat\Hook\Tester\HookableStepTester->test()
+      │ * line 104 of /lib/behat/extension/Moodle/BehatExtension/EventDispatcher/Tester/MoodleEventDispatchingStepTester.php: call to Moodle\BehatExtension\EventDispatcher\Tester\ChainedStepTester->test()
+      │ * line 59 of /vendor/behat/behat/src/Behat/Behat/Tester/StepContainerTester.php: call to Moodle\BehatExtension\EventDispatcher\Tester\MoodleEventDispatchingStepTester->test()
+      │ * line 72 of /vendor/behat/behat/src/Behat/Behat/Tester/Runtime/RuntimeBackgroundTester.php: call to Behat\Behat\Tester\StepContainerTester->test()
+      │ * line 76 of /vendor/behat/behat/src/Behat/Behat/EventDispatcher/Tester/EventDispatchingBackgroundTester.php: call to Behat\Behat\Tester\Runtime\RuntimeBackgroundTester->test()
+      │ * line 102 of /vendor/behat/behat/src/Behat/Behat/Tester/Runtime/RuntimeScenarioTester.php: call to Behat\Behat\EventDispatcher\Tester\EventDispatchingBackgroundTester->test()
+      │ * line 70 of /vendor/behat/behat/src/Behat/Behat/Tester/Runtime/RuntimeScenarioTester.php: call to Behat\Behat\Tester\Runtime\RuntimeScenarioTester->testBackground()
+      │ * line 74 of /vendor/behat/behat/src/Behat/Behat/Hook/Tester/HookableScenarioTester.php: call to Behat\Behat\Tester\Runtime\RuntimeScenarioTester->test()
+      │ * line 106 of /vendor/behat/behat/src/Behat/Behat/EventDispatcher/Tester/EventDispatchingScenarioTester.php: call to Behat\Behat\Hook\Tester\HookableScenarioTester->test()
+      │ * line 69 of /vendor/behat/behat/src/Behat/Behat/Tester/Runtime/IsolatingScenarioTester.php: call to Behat\Behat\EventDispatcher\Tester\EventDispatchingScenarioTester->test()
+      │ * line 84 of /vendor/behat/behat/src/Behat/Behat/Tester/Runtime/RuntimeFeatureTester.php: call to Behat\Behat\Tester\Runtime\IsolatingScenarioTester->test()
+      │ * line 72 of /vendor/behat/behat/src/Behat/Behat/Hook/Tester/HookableFeatureTester.php: call to Behat\Behat\Tester\Runtime\RuntimeFeatureTester->test()
+      │ * line 74 of /vendor/behat/behat/src/Behat/Behat/EventDispatcher/Tester/EventDispatchingFeatureTester.php: call to Behat\Behat\Hook\Tester\HookableFeatureTester->test()
+      │ * line 63 of /vendor/behat/behat/src/Behat/Testwork/Tester/Runtime/RuntimeSuiteTester.php: call to Behat\Behat\EventDispatcher\Tester\EventDispatchingFeatureTester->test()
+      │ * line 73 of /vendor/behat/behat/src/Behat/Testwork/Hook/Tester/HookableSuiteTester.php: call to Behat\Testwork\Tester\Runtime\RuntimeSuiteTester->test()
+      │ * line 75 of /vendor/behat/behat/src/Behat/Testwork/EventDispatcher/Tester/EventDispatchingSuiteTester.php: call to Behat\Testwork\Hook\Tester\HookableSuiteTester->test()
+      │ * line 71 of /vendor/behat/behat/src/Behat/Testwork/Tester/Runtime/RuntimeExercise.php: call to Behat\Testwork\EventDispatcher\Tester\EventDispatchingSuiteTester->test()
+      │ * line 73 of /vendor/behat/behat/src/Behat/Testwork/EventDispatcher/Tester/EventDispatchingExercise.php: call to Behat\Testwork\Tester\Runtime\RuntimeExercise->test()
+      │ * line 80 of /vendor/behat/behat/src/Behat/Testwork/Ordering/OrderedExercise.php: call to Behat\Testwork\EventDispatcher\Tester\EventDispatchingExercise->test()
+      │ * line 149 of /vendor/behat/behat/src/Behat/Testwork/Tester/Cli/ExerciseController.php: call to Behat\Testwork\Ordering\OrderedExercise->test()
+      │ * line 108 of /vendor/behat/behat/src/Behat/Testwork/Tester/Cli/ExerciseController.php: call to Behat\Testwork\Tester\Cli\ExerciseController->testSpecifications()
+      │ * line 63 of /vendor/behat/behat/src/Behat/Testwork/Cli/Command.php: call to Behat\Testwork\Tester\Cli\ExerciseController->execute()
+      │ * line 291 of /vendor/symfony/console/Command/Command.php: call to Behat\Testwork\Cli\Command->execute()
+      │ * line 1014 of /vendor/symfony/console/Application.php: call to Symfony\Component\Console\Command\Command->run()
+      │ * line 301 of /vendor/symfony/console/Application.php: call to Symfony\Component\Console\Application->doRunCommand()
+      │ * line 124 of /vendor/behat/behat/src/Behat/Testwork/Cli/Application.php: call to Symfony\Component\Console\Application->doRun()
+      │ * line 171 of /vendor/symfony/console/Application.php: call to Behat\Testwork\Cli\Application->doRun()
+      │ * line 34 of /vendor/behat/behat/bin/behat: call to Symfony\Component\Console\Application->run()
+      │ * line 119 of /vendor/bin/behat: call to include()
+      │ 
+
+  [1mScenario:[22m El curso BBDD existe y el estudiante puede acceder [30m# /var/www/html/mod/sqlab/tests/behat/FUN-01_sqlab_acceso_actividad.feature:15[39m
+    [32mGiven I log in as "[39m[32;1mstudent1[39;22m[32m"[39m                               [30m# behat_auth::i_log_in_as()[39m
+    [32mAnd I am on "[39m[32;1mBBDD[39;22m[32m" course homepage[39m                         [30m# behat_theme_boost_behat_navigation::i_am_on_course_homepage()[39m
+    [32mThen I should see "[39m[32;1mBase de Datos[39;22m[32m"[39m                          [30m# behat_general::assert_page_contains_text()[39m
+
+  [1mScenario:[22m Admin puede ver el catálogo de actividades del curso [30m# /var/www/html/mod/sqlab/tests/behat/FUN-01_sqlab_acceso_actividad.feature:20[39m
+    [32mAnd the following "[39m[32;1mcourse enrolments[39;22m[32m" exist:[39m                 [30m# behat_data_generators::the_following_entities_exist()[39m
+[32m      | user     | course | role    |
+      | student1 | BBDD   | student |[39m
+      │ ++ Exception encountered in event observer '\mod_sqlab\observer::handle_role_assigned': Warning: pg_connect(): Unable to connect to PostgreSQL server: could not translate host name "postgres" to address: Temporary failure in name resolution in /var/www/html/mod/sqlab/classes/dbconnector.php line 45 ++
+      │ * line ? of unknownfile: call to Behat\Testwork\Call\Handler\RuntimeCallHandler->handleError()
+      │ * line 45 of /mod/sqlab/classes/dbconnector.php: call to pg_connect()
+      │ * line 179 of /mod/sqlab/classes/database_manager.php: call to mod_sqlab\dbconnector->connect()
+      │ * line 62 of /mod/sqlab/classes/database_manager.php: call to mod_sqlab\database_manager::check_database_exists()
+      │ * line 16 of /mod/sqlab/classes/observer.php: call to mod_sqlab\database_manager::handle_role_assignment()
+      │ * line ? of unknownfile: call to mod_sqlab\observer::handle_role_assigned()
+      │ * line 155 of /lib/classes/event/manager.php: call to call_user_func()
+      │ * line 75 of /lib/classes/event/manager.php: call to core\event\manager::process_buffers()
+      │ * line 795 of /lib/classes/event/base.php: call to core\event\manager::dispatch()
+      │ * line 1680 of /lib/accesslib.php: call to core\event\base->trigger()
+      │ * line 2164 of /lib/enrollib.php: call to role_assign()
+      │ * line 1032 of /lib/testing/generator/data_generator.php: call to enrol_plugin->enrol_user()
+      │ * line 631 of /lib/behat/classes/behat_core_generator.php: call to testing_data_generator->enrol_user()
+      │ * line 266 of /lib/behat/classes/behat_generator_base.php: call to behat_core_generator->process_enrol_user()
+      │ * line 92 of /lib/tests/behat/behat_data_generators.php: call to behat_generator_base->generate_items()
+      │ * line 110 of /vendor/behat/behat/src/Behat/Testwork/Call/Handler/RuntimeCallHandler.php: call to behat_data_generators->the_following_entities_exist()
+      │ * line 64 of /vendor/behat/behat/src/Behat/Testwork/Call/Handler/RuntimeCallHandler.php: call to Behat\Testwork\Call\Handler\RuntimeCallHandler->executeCall()
+      │ * line 138 of /vendor/behat/behat/src/Behat/Testwork/Call/CallCenter.php: call to Behat\Testwork\Call\Handler\RuntimeCallHandler->handleCall()
+      │ * line 96 of /vendor/behat/behat/src/Behat/Testwork/Call/CallCenter.php: call to Behat\Testwork\Call\CallCenter->handleCall()
+      │ * line 125 of /vendor/behat/behat/src/Behat/Behat/Tester/Runtime/RuntimeStepTester.php: call to Behat\Testwork\Call\CallCenter->makeCall()
+      │ * line 73 of /vendor/behat/behat/src/Behat/Behat/Tester/Runtime/RuntimeStepTester.php: call to Behat\Behat\Tester\Runtime\RuntimeStepTester->testDefinition()
+      │ * line 74 of /vendor/behat/behat/src/Behat/Behat/Hook/Tester/HookableStepTester.php: call to Behat\Behat\Tester\Runtime\RuntimeStepTester->test()
+      │ * line 110 of /lib/behat/extension/Moodle/BehatExtension/EventDispatcher/Tester/ChainedStepTester.php: call to Behat\Behat\Hook\Tester\HookableStepTester->test()
+      │ * line 104 of /lib/behat/extension/Moodle/BehatExtension/EventDispatcher/Tester/MoodleEventDispatchingStepTester.php: call to Moodle\BehatExtension\EventDispatcher\Tester\ChainedStepTester->test()
+      │ * line 59 of /vendor/behat/behat/src/Behat/Behat/Tester/StepContainerTester.php: call to Moodle\BehatExtension\EventDispatcher\Tester\MoodleEventDispatchingStepTester->test()
+      │ * line 72 of /vendor/behat/behat/src/Behat/Behat/Tester/Runtime/RuntimeBackgroundTester.php: call to Behat\Behat\Tester\StepContainerTester->test()
+      │ * line 76 of /vendor/behat/behat/src/Behat/Behat/EventDispatcher/Tester/EventDispatchingBackgroundTester.php: call to Behat\Behat\Tester\Runtime\RuntimeBackgroundTester->test()
+      │ * line 102 of /vendor/behat/behat/src/Behat/Behat/Tester/Runtime/RuntimeScenarioTester.php: call to Behat\Behat\EventDispatcher\Tester\EventDispatchingBackgroundTester->test()
+      │ * line 70 of /vendor/behat/behat/src/Behat/Behat/Tester/Runtime/RuntimeScenarioTester.php: call to Behat\Behat\Tester\Runtime\RuntimeScenarioTester->testBackground()
+      │ * line 74 of /vendor/behat/behat/src/Behat/Behat/Hook/Tester/HookableScenarioTester.php: call to Behat\Behat\Tester\Runtime\RuntimeScenarioTester->test()
+      │ * line 106 of /vendor/behat/behat/src/Behat/Behat/EventDispatcher/Tester/EventDispatchingScenarioTester.php: call to Behat\Behat\Hook\Tester\HookableScenarioTester->test()
+      │ * line 69 of /vendor/behat/behat/src/Behat/Behat/Tester/Runtime/IsolatingScenarioTester.php: call to Behat\Behat\EventDispatcher\Tester\EventDispatchingScenarioTester->test()
+      │ * line 84 of /vendor/behat/behat/src/Behat/Behat/Tester/Runtime/RuntimeFeatureTester.php: call to Behat\Behat\Tester\Runtime\IsolatingScenarioTester->test()
+      │ * line 72 of /vendor/behat/behat/src/Behat/Behat/Hook/Tester/HookableFeatureTester.php: call to Behat\Behat\Tester\Runtime\RuntimeFeatureTester->test()
+      │ * line 74 of /vendor/behat/behat/src/Behat/Behat/EventDispatcher/Tester/EventDispatchingFeatureTester.php: call to Behat\Behat\Hook\Tester\HookableFeatureTester->test()
+      │ * line 63 of /vendor/behat/behat/src/Behat/Testwork/Tester/Runtime/RuntimeSuiteTester.php: call to Behat\Behat\EventDispatcher\Tester\EventDispatchingFeatureTester->test()
+      │ * line 73 of /vendor/behat/behat/src/Behat/Testwork/Hook/Tester/HookableSuiteTester.php: call to Behat\Testwork\Tester\Runtime\RuntimeSuiteTester->test()
+      │ * line 75 of /vendor/behat/behat/src/Behat/Testwork/EventDispatcher/Tester/EventDispatchingSuiteTester.php: call to Behat\Testwork\Hook\Tester\HookableSuiteTester->test()
+      │ * line 71 of /vendor/behat/behat/src/Behat/Testwork/Tester/Runtime/RuntimeExercise.php: call to Behat\Testwork\EventDispatcher\Tester\EventDispatchingSuiteTester->test()
+      │ * line 73 of /vendor/behat/behat/src/Behat/Testwork/EventDispatcher/Tester/EventDispatchingExercise.php: call to Behat\Testwork\Tester\Runtime\RuntimeExercise->test()
+      │ * line 80 of /vendor/behat/behat/src/Behat/Testwork/Ordering/OrderedExercise.php: call to Behat\Testwork\EventDispatcher\Tester\EventDispatchingExercise->test()
+      │ * line 149 of /vendor/behat/behat/src/Behat/Testwork/Tester/Cli/ExerciseController.php: call to Behat\Testwork\Ordering\OrderedExercise->test()
+      │ * line 108 of /vendor/behat/behat/src/Behat/Testwork/Tester/Cli/ExerciseController.php: call to Behat\Testwork\Tester\Cli\ExerciseController->testSpecifications()
+      │ * line 63 of /vendor/behat/behat/src/Behat/Testwork/Cli/Command.php: call to Behat\Testwork\Tester\Cli\ExerciseController->execute()
+      │ * line 291 of /vendor/symfony/console/Command/Command.php: call to Behat\Testwork\Cli\Command->execute()
+      │ * line 1014 of /vendor/symfony/console/Application.php: call to Symfony\Component\Console\Command\Command->run()
+      │ * line 301 of /vendor/symfony/console/Application.php: call to Symfony\Component\Console\Application->doRunCommand()
+      │ * line 124 of /vendor/behat/behat/src/Behat/Testwork/Cli/Application.php: call to Symfony\Component\Console\Application->doRun()
+      │ * line 171 of /vendor/symfony/console/Application.php: call to Behat\Testwork\Cli\Application->doRun()
+      │ * line 34 of /vendor/behat/behat/bin/behat: call to Symfony\Component\Console\Application->run()
+      │ * line 119 of /vendor/bin/behat: call to include()
+      │ 
+    [32mGiven I log in as "[39m[32;1madmin[39;22m[32m"[39m                                    [30m# behat_auth::i_log_in_as()[39m
+    [32mAnd I am on "[39m[32;1mBBDD[39;22m[32m" course homepage[39m                           [30m# behat_theme_boost_behat_navigation::i_am_on_course_homepage()[39m
+    [32mThen I should see "[39m[32;1mBase de Datos[39;22m[32m"[39m                            [30m# behat_general::assert_page_contains_text()[39m
+
+[36m@mod @mod_sqlab[39m
+[1mFeature:[22m FUN-03 El plugin mod_sqlab está instalado en Moodle
+
+  [1mScenario:[22m El plugin SQLab aparece en la lista de módulos de actividad                       [30m# /var/www/html/mod/sqlab/tests/behat/FUN-03_sqlab_instalacion.feature:4[39m
+    [32mGiven I log in as "[39m[32;1madmin[39;22m[32m"[39m                                                                 [30m# behat_auth::i_log_in_as()[39m
+    [32mAnd I navigate to "[39m[32;1mPlugins > Activity modules > Manage activities[39;22m[32m" in site administration[39m [30m# behat_theme_boost_behat_navigation::i_navigate_to_in_site_administration()[39m
+    [31mThen I should see "[39m[31;1msqlab[39;22m[31m"[39m                                                                 [30m# behat_general::assert_page_contains_text()[39m
+[31m      "sqlab" text was not found in the page (Behat\Mink\Exception\ExpectationException)[39m
+    [36mAnd I should see "[39m[36;1mSQLab[39;22m[36m"[39m                                                                  [30m# behat_general::assert_page_contains_text()[39m
+
+--- [31mFailed scenarios:[39m
+
+    [31m/var/www/html/mod/sqlab/tests/behat/FUN-03_sqlab_instalacion.feature:4[39m
+
+3 scenarios ([32m2 passed[39m, [31m1 failed[39m)
+16 steps ([32m14 passed[39m, [31m1 failed[39m, [36m1 skipped[39m)
+0m10.41s (55.97Mb)
