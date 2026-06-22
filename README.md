@@ -10,17 +10,11 @@
 
 ## ¿De qué trata este repositorio?
 
-Este repositorio contiene los artefactos de prueba desarrollados en el Trabajo Fin de Grado cuyo objetivo es **analizar los requisitos de calidad software exigidos por Moodle para la publicación de plugins y aplicarlos sobre el plugin `mod_sqlab`**.
+Este repositorio contiene las pruebas y los resultados cuyo objetivo es **analizar los requisitos de calidad software exigidos por Moodle para la publicación de plugins y aplicarlos sobre el plugin `mod_sqlab`**.
 
 El trabajo propone una metodología de evaluación reproducible basada en las herramientas del ecosistema oficial de Moodle (phplint, phpcs, PHPUnit) y, para la validación funcional, en **Selenium WebDriver**, aplicable a cualquier plugin de tipo *módulo de actividad*.
 
-La validación funcional se diseñó inicialmente con Behat, pero la ausencia del generador de datos del plugin (`tests/generator/lib.php`) y la imposibilidad de Behat de simular dos usuarios simultáneos llevaron a ejecutarla con **Selenium**, lanzado en remoto contra el servidor de despliegue del tutor a través de VPN. Los ficheros Behat se conservan como diseño de referencia. El detalle de esta decisión está en el Capítulo 5 de la memoria.
-
----
-
 ## Estructura del repositorio
-
-```
 TfgCarmenCrespo/
 ├── README.md
 ├── tests/
@@ -60,13 +54,6 @@ TfgCarmenCrespo/
     │   └── resultado_phpcs.txt                   ← Salida de phpcs (estándar moodle-cs)
     └── phpunit/
         └── phpunit_definitivo_20260615.txt       ← Salida PHPUnit (servidor del tutor, UNI-02..06)
-```
-
-> **Nota.** El plugin `mod_sqlab` **no** incluye el fichero `tests/generator/lib.php`. El generador de datos es infraestructura de pruebas cuya implementación corresponde al desarrollador del plugin; su ausencia se documenta en la memoria como un hallazgo de la evaluación, no se suple en este trabajo.
-
----
-
-## Cobertura de pruebas
 
 ### Validación estática
 
@@ -100,17 +87,6 @@ TfgCarmenCrespo/
 | `selenium_FUN09.py` | FUN-09 | CU-09 | Botón diccionario · menú sin error · snippet en editor | student1 |
 | `selenium_FUN10.py` | FUN-10 | CU-10, CU-11, CU-12 | Elementos colaborativos (1 usuario) · dos usuarios simultáneos | student1, student2 |
 | `selenium_FUN12.py` | FUN-12 | Integral | Flujo colaborativo completo entre dos usuarios | student1, student2 |
-
-
-## Datos del entorno de ejecución de Selenium
-
-| Parámetro | Valor |
-|---|---|
-| URL base de Moodle | `https://moodle.repobcam.i3a.uclm.es:10443` |
-| Curso de prueba | «bbdd» — `course id = 2` |
-| Actividad SQLab | `course module id = 5` (`/mod/sqlab/view.php?id=5`) |
-| Usuarios | `student1`, `student2`, `carmenprof`, `admin` |
-
 
 ## Resultados
 
