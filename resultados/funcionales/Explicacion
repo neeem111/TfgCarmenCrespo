@@ -1,0 +1,2 @@
+Se encuentra las dos versiones de demostración, siendo la Human la versión en la que se comprueba  que la sincronización en tiempo real vía WebSocket es una funcionalidad nativa de la sala y no un artefacto de la automatización. El usuario humano pudo observar en su propio navegador el contenido que los usuarios de prueba escribían en el editor compartido, así como escribir su propio texto y comprobar que era visible instantáneamente en las ventanas de student1 y student2, confirmando que la funcionalidad colaborativa no depende de las particularidades del entorno Selenium.
+
