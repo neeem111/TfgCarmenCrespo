@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 selenium_FUN09.py — FUN-09: Menú de diccionario de datos
-Cubre: CU-09 (consultar diccionario mediante el menú jerárquico de snippets)
+Cubre: CU-08 (consultar diccionario mediante el menú jerárquico de snippets)
 
 Escenarios:
   SC1 — El botón del diccionario (aria-label confirmado del HTML real) es visible

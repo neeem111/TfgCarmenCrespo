@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 selenium_FUN01.py — FUN-01: Acceso al curso y verificación de roles
-Cubre: CU-00 (estudiante accede al curso), CU-07 (profesor activa edición)
+Cubre: Requisito de roles y permisos (no deriva de un caso de uso)
 
 Escenarios:
   SC1 — Estudiante matriculado puede acceder al curso y ve la actividad SQLab

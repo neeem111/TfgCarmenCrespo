@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 selenium_FUN10.py — FUN-10: Entorno colaborativo
-Cubre: CU-10 (crear sala), CU-11 (unirse), CU-12 (awareness/participantes)
+Cubre: CU-09 (crear sala), CU-10 (unirse), CU-11 (awareness/participantes)
 
 Escenarios:
   SC1 — "Sala" y campo "Escriba el ID de la sala" visibles

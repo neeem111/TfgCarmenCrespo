@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 selenium_FUN05.py — FUN-05: Profesor crea/configura actividad SQLab
-Cubre: CU-08 (profesor crea y configura actividad SQLab en el curso)
+Cubre: CU-07 (profesor crea y configura actividad SQLab en el curso)
 
 Escenarios:
   SC1 — SQLab disponible en el selector de actividades (como carmenprof)

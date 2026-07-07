@@ -8,7 +8,8 @@ Escenarios:
   SC2 — Página de admin sin errores PHP
   SC3 — Plugin no aparece como no instalado/faltante
 
-NOTA: Este test requiere credenciales de admin (verificación de infraestructura).
+NOTA: Requiere credenciales de admin, no disponibles en este trabajo -> EXCLUIDO
+      del alcance ejecutado. La instalacion se verifica con PHPUnit (UNI-02a).
       Confirmado por Behat: "sqlab" en minúsculas NO aparece → el texto es "SQLab".
 
 Uso: python selenium_FUN03.py
