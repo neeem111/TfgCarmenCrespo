@@ -1,26 +1,25 @@
 @mod @mod_sqlab @javascript
 Feature: FUN-09 Estudiante accede al menú de diccionario de datos en mod_sqlab
-  # Cubre:
-  # CU-08 — Estudiante: Consultar el diccionario de datos mediante el menú jerárquico de snippets
+  # esto cubre CU-08: que el estudiante pueda consultar el diccionario de datos
+  # a través del menú jerárquico de snippets del plugin.
   #
-  # DESCRIPCIÓN DE LA FUNCIONALIDAD:
-  #   El plugin incluye un menú jerárquico con snippets de código para consultar el
-  #   diccionario de datos de la base de datos del alumno (equivalente a comandos psql).
+  # cómo funciona esta parte (para que quede claro por qué escribo estos pasos):
+  #   el plugin trae un menú con snippets de código que hacen de equivalente a
+  #   comandos psql, para que el alumno consulte el diccionario de datos de su
+  #   propia BD sin tener que memorizar sintaxis de catálogo.
   #
-  # REQUISITO DE ENTORNO (servidor del tutor):
-  #   - Plugin mod_sqlab instalado y activo.
-  #   - Servidor PostgreSQL externo configurado y accesible.
-  #   - Actividad SQLab "Consultas básicas" en el curso BBDD con al menos una pregunta.
-  #   - El estudiante student1 matriculado en el curso.
+  # entorno necesario:
+  #   - mod_sqlab instalado y activo.
+  #   - PostgreSQL externo accesible.
+  #   - actividad "Consultas básicas" con al menos una pregunta.
+  #   - student1 matriculado.
   #
-  # Requiere @javascript: el menú del diccionario es un componente dinámico.
+  # lleva @javascript porque el menú del diccionario es dinámico.
   #
-  # NOTA PARA EL TUTOR:
-  #   - Ajustar los literales de los pasos "I should see" al texto real de los elementos
-  #     del menú de diccionario en la interfaz definitiva del plugin
-  #     (p. ej., "Diccionario", "\\dt", "Tablas", etc.).
-  #   - Si el menú se activa mediante un botón o icono específico, reemplazar
-  #     I follow "Diccionario" por el paso correspondiente.
+  # mismo problema de siempre: el Background depende del generador de datos que
+  # mod_sqlab no tiene, así que esto no se ha ejecutado nunca de verdad. los
+  # literales "Diccionario", "Tablas" etc. son mi mejor suposición de cómo se
+  # llamarían los elementos del menú, habría que confirmarlos contra la interfaz real.
 
   Background:
     Given the following "courses" exist:
@@ -36,7 +35,7 @@ Feature: FUN-09 Estudiante accede al menú de diccionario de datos en mod_sqlab
       | activity | course | name              | intro                      | section |
       | sqlab    | BBDD   | Consultas básicas | Practica tus consultas SQL | 1       |
 
-  # CU-08a — El menú de diccionario de datos está visible en la actividad
+  # aquí compruebo simplemente que el menú del diccionario está visible al entrar
   Scenario: El estudiante ve el menú de diccionario de datos al acceder a la actividad
     Given I log in as "student1"
     And I am on "BBDD" course homepage
@@ -45,7 +44,7 @@ Feature: FUN-09 Estudiante accede al menú de diccionario de datos en mod_sqlab
     And I should not see "Fatal error"
     And I should not see "Warning:"
 
-  # CU-08b — El menú jerárquico se despliega sin errores al interactuar con él
+  # aquí ya interactúo con el menú (lo despliego) y compruebo que no salta ningún error PHP
   Scenario: El estudiante puede desplegar el menú jerárquico del diccionario sin errores
     Given I log in as "student1"
     And I am on "BBDD" course homepage
@@ -55,7 +54,8 @@ Feature: FUN-09 Estudiante accede al menú de diccionario de datos en mod_sqlab
     And I should not see "Warning:"
     And I should not see "Notice:"
 
-  # CU-08c — Al seleccionar un snippet del diccionario, el código se inserta en el editor SQL
+  # y aquí compruebo la parte más útil de la función: que al pinchar en un
+  # snippet concreto (p. ej. "Tablas"), su código se inserta solo en el editor SQL
   Scenario: El código del snippet seleccionado del diccionario se inserta en el editor SQL
     Given I log in as "student1"
     And I am on "BBDD" course homepage

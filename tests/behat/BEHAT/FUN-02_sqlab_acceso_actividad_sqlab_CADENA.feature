@@ -1,29 +1,40 @@
 @mod @mod_sqlab
 Feature: FUN-02 (cadena de dependencias) Estudiante accede a una actividad SQLab
-  # Variante propuesta por el tutor (correo): en lugar de crear la actividad sqlab
-  # directamente, se construye primero su cadena de dependencias:
-  #   1. Preguntas de tipo sqlquestion
-  #   2. Actividad Quiz que contiene esas preguntas
-  #   3. Actividad SQLab enlazada al id del Quiz
+  # esta es mi variante "de rescate" para FUN-02, la propuesta que hablé con el
+  # tutor por correo: ya que crear la actividad sqlab directamente no funciona
+  # (falta el generador), voy a intentar montar antes toda la cadena de la que
+  # depende, a ver si así consigo esquivar el problema:
+  #   1. categoría de preguntas
+  #   2. preguntas de tipo sqlquestion
+  #   3. un Quiz que contenga esas preguntas
+  #   4. la actividad SQLab enlazada al id de ese Quiz
   #
-  # OBJETIVO DEL EXPERIMENTO:
-  #   Comprobar si, existiendo ya el Quiz, desaparece el error "Invalid Quiz ID"
-  #   que aborta el Background en la versión directa de FUN-02.
+  # lo que quiero comprobar con este experimento: si existiendo ya el Quiz de verdad
+  # desaparece el error "Invalid Quiz ID" que me tumbaba el Background en el FUN-02
+  # normal, o si el problema está más abajo en la cadena.
   #
-  # CONDICIONES QUE DEBEN CUMPLIRSE (dependen del código del plugin, no del test):
-  #   - qtype_sqlquestion debe exponer generador de preguntas para Behat
-  #     (paso 'the following "questions" exist' con qtype = sqlquestion).
-  #   - mod_sqlab debe tener tests/generator/lib.php capaz de aceptar el quiz.
+  # esto depende del propio código del plugin, no de cómo escriba el test:
+  #   - qtype_sqlquestion tiene que exponer un generador de preguntas para Behat
+  #     (el paso "the following questions exist" con qtype = sqlquestion).
+  #   - mod_sqlab tiene que tener tests/generator/lib.php y aceptar el quiz.
   #
-  # CÓMO LEER EL RESULTADO:
-  #   - Pasa el Background -> la cadena funciona; Behat es viable para 1 usuario.
-  #   - Falla en 'questions' -> qtype_sqlquestion no tiene generador.
-  #   - Falla al crear 'sqlab' -> mod_sqlab no tiene generador (confirma el hallazgo).
+  # cómo leer el resultado si lo relanzo:
+  #   - si pasa el Background entero, la cadena funciona y Behat sería viable.
+  #   - si falla en el paso de "questions", es que qtype_sqlquestion no tiene generador.
+  #   - si falla al crear la actividad "sqlab", es que mod_sqlab sigue sin generador
+  #     (confirmaría lo mismo que ya vi en el FUN-02 normal).
   #
-  # AJUSTES PROBABLES (revisar si falla):
-  #   - El campo que enlaza sqlab con el quiz puede llamarse 'quiz', 'quizid' o
-  #     referenciarse por 'idnumber'. Probar las variantes comentadas abajo.
-  #   - 'questiontext' / nombre de la categoría pueden requerir ajuste.
+  # cosas que probablemente tenga que retocar si falla:
+  #   - el campo que enlaza sqlab con el quiz puede llamarse "quiz", "quizid" o
+  #     ir por "idnumber". dejo las variantes comentadas más abajo por si acaso.
+  #   - el "questiontext" o el nombre de la categoría de preguntas puede necesitar ajuste.
+  #
+  # RESULTADO REAL (esto es lo importante): al ejecutarlo, la cadena se rompe ya
+  # en el paso de crear la pregunta sqlquestion — qtype_sqlquestion no implementa
+  # el helper.php que Moodle exige para los tipos de pregunta, así que ni siquiera
+  # llego a probar si el enlace sqlab-quiz funcionaría. este fichero, igual que el
+  # FUN-02 normal, se queda como diseño/documentación de la cadena de dependencias,
+  # NO como una prueba que haya pasado.
 
   Background:
     Given the following "courses" exist:
@@ -35,40 +46,46 @@ Feature: FUN-02 (cadena de dependencias) Estudiante accede a una actividad SQLab
     And the following "course enrolments" exist:
       | user     | course | role    |
       | student1 | BBDD   | student |
-    # 1) Categoria de preguntas en el contexto del curso
+    # paso 1: categoría de preguntas en el contexto del curso
     And the following "question categories" exist:
       | contextlevel | reference | name          |
       | Course       | BBDD      | Preguntas SQL |
-    # 2) Preguntas de tipo sqlquestion
+    # paso 2: la pregunta de tipo sqlquestion. AQUÍ ES DONDE SE ME ROMPE TODO,
+    # porque qtype_sqlquestion no tiene el helper.php que Moodle pide para que
+    # el generador de preguntas de Behat sepa crear este tipo de pregunta.
     And the following "questions" exist:
       | questioncategory | qtype       | name   | questiontext             |
       | Preguntas SQL    | sqlquestion | SQL-01 | Escribe un SELECT basico |
-    # 3) Actividad Quiz (con idnumber para poder referenciarla)
+    # paso 3: actividad Quiz (con idnumber para poder referenciarla luego)
     And the following "activities" exist:
       | activity | course | name              | idnumber | section |
       | quiz     | BBDD   | Cuestionario SQL  | quiz1    | 1       |
-    # 4) Anadir la pregunta al quiz
+    # paso 4: añadir la pregunta al quiz
     And quiz "Cuestionario SQL" contains the following questions:
       | question | page |
       | SQL-01   | 1    |
-    # 5) Actividad SQLab enlazada al Quiz.
-    #    Probar primero con 'quiz' = idnumber del cuestionario:
+    # paso 5: actividad SQLab enlazada al Quiz.
+    # pruebo primero con "quiz" = idnumber del cuestionario:
     And the following "activities" exist:
       | activity | course | name              | intro                      | quiz  | section |
       | sqlab    | BBDD   | Consultas basicas | Practica tus consultas SQL | quiz1 | 1       |
-    # Si la linea anterior falla por el campo 'quiz', probar estas variantes
-    # (de una en una, comentando la de arriba):
+    # si la línea de arriba falla por el nombre del campo "quiz", dejo aquí anotadas
+    # las variantes que probaría después (una a la vez, comentando la anterior):
     #   | activity | course | name              | intro | quizid | section |
     #   | sqlab    | BBDD   | Consultas basicas | ...   | quiz1  | 1       |
     #   | activity | course | name              | intro | quizidnumber | section |
     #   | sqlab    | BBDD   | Consultas basicas | ...   | quiz1        | 1       |
+    # en la práctica nunca llegué a probar estas variantes porque el fallo del
+    # paso 2 (la pregunta sqlquestion) ya impide seguir con la cadena.
 
-  # CU-01
+  # de nuevo, mismo objetivo que en el FUN-02 normal (CU-01): ver la actividad
+  # listada en el curso. si el Background no llega a montarse, esto no se ejecuta.
   Scenario: El estudiante ve la actividad SQLab en el curso
     Given I log in as "student1"
     And I am on "BBDD" course homepage
     Then I should see "Consultas basicas"
 
+  # y aquí comprobaría que se puede abrir la actividad y ver su descripción
   Scenario: El estudiante puede abrir la actividad SQLab y ver su descripcion
     Given I log in as "student1"
     And I am on "BBDD" course homepage

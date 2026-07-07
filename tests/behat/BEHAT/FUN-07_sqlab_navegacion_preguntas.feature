@@ -1,24 +1,23 @@
 @mod @mod_sqlab @javascript
 Feature: FUN-07 Estudiante navega entre preguntas de la actividad SQLab
-  # Cubre:
-  # CU-05 — Estudiante: Navegar entre preguntas de la misma actividad
+  # esto cubre CU-05: que el estudiante pueda ir y venir entre preguntas de la
+  # misma actividad sin que la interfaz se rompa ni suelte errores PHP.
   #
-  # REQUISITO DE ENTORNO (servidor del tutor):
-  #   - Plugin mod_sqlab instalado y activo.
-  #   - Servidor PostgreSQL externo configurado y accesible.
-  #   - Actividad SQLab "Consultas básicas" en el curso BBDD con AL MENOS DOS preguntas
-  #     configuradas y visibles para el estudiante.
-  #   - El estudiante student1 matriculado en el curso.
+  # para ejecutarlo de verdad necesitaría:
+  #   - mod_sqlab instalado y activo.
+  #   - PostgreSQL externo accesible.
+  #   - la actividad "Consultas básicas" con AL MENOS DOS preguntas configuradas
+  #     y visibles (con solo una pregunta no tiene sentido probar "siguiente").
+  #   - student1 matriculado.
   #
-  # Requiere @javascript: los controles de navegación entre preguntas son dinámicos.
+  # lleva @javascript porque los botones de navegación son dinámicos.
   #
-  # NOTA PARA EL TUTOR:
-  #   - Ajustar los textos "Siguiente" y "Anterior" al texto real de los botones de
-  #     navegación en la interfaz del plugin definitivo.
-  #   - Si la navegación se implementa mediante una lista numerada de preguntas (en lugar
-  #     de botones), sustituir I press "Siguiente" por el paso equivalente (p. ej.,
-  #     I follow "Pregunta 2").
-  #   - Verificar que la actividad tiene efectivamente más de una pregunta antes de ejecutar.
+  # otra vez el mismo problema de fondo: el Background depende de crear la
+  # actividad vía generador, que no existe en mod_sqlab, así que esto tampoco
+  # se ha podido ejecutar. lo dejo como diseño: los textos "Siguiente"/"Anterior"
+  # son un supuesto razonable, pero habría que confirmarlos contra la interfaz
+  # real (o cambiar el paso si la navegación fuera con una lista numerada tipo
+  # "Pregunta 2" en vez de botones).
 
   Background:
     Given the following "courses" exist:
@@ -34,7 +33,8 @@ Feature: FUN-07 Estudiante navega entre preguntas de la actividad SQLab
       | activity | course | name              | intro                       | section |
       | sqlab    | BBDD   | Consultas básicas | Practica tus consultas SQL  | 1       |
 
-  # CU-05a — El control de navegación hacia la pregunta siguiente está presente
+  # aquí solo compruebo que el botón/control de "siguiente" está ahí, visible,
+  # antes de intentar usarlo
   Scenario: El estudiante ve los controles de navegación entre preguntas
     Given I log in as "student1"
     And I am on "BBDD" course homepage
@@ -43,7 +43,7 @@ Feature: FUN-07 Estudiante navega entre preguntas de la actividad SQLab
     And I should not see "Fatal error"
     And I should not see "Warning:"
 
-  # CU-05b — El estudiante puede navegar a la pregunta siguiente sin error
+  # aquí ya pulso "siguiente" de verdad y compruebo que no salta ningún error PHP
   Scenario: El estudiante puede avanzar a la siguiente pregunta sin generar errores
     Given I log in as "student1"
     And I am on "BBDD" course homepage
@@ -53,7 +53,8 @@ Feature: FUN-07 Estudiante navega entre preguntas de la actividad SQLab
     And I should not see "Warning:"
     And I should not see "Notice:"
 
-  # CU-05c — El estudiante puede volver a la pregunta anterior sin error
+  # y el camino de vuelta: avanzo y luego retrocedo, para comprobar que también
+  # funciona en el sentido contrario sin romperse
   Scenario: El estudiante puede volver a la pregunta anterior desde la segunda pregunta
     Given I log in as "student1"
     And I am on "BBDD" course homepage

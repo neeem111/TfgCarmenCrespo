@@ -1,39 +1,38 @@
 @mod @mod_sqlab @javascript
 Feature: FUN-10 Entorno colaborativo en mod_sqlab
-  # Cubre:
-  # CU-09 — Usuario (profesor o estudiante): Crear e invitar a otros a una sesión colaborativa
-  # CU-10 — Usuario: Unirse a una sala colaborativa mediante ID
-  # CU-11 — Usuario: Ver el indicador de awareness (ID sala, participantes conectados)
+  # este es el más ambicioso de todos: cubre CU-09 (crear e invitar a una sesión
+  # colaborativa), CU-10 (unirse a una sala mediante ID) y CU-11 (ver el indicador
+  # de awareness, o sea quién está conectado en la sala).
   #
-  # DESCRIPCIÓN DE LA FUNCIONALIDAD:
-  #   Cualquier usuario (profesor o estudiante) puede invitar a otros a una sesión
-  #   colaborativa en la que los participantes pueden escribir código de forma conjunta.
-  #   Cuando la actividad está configurada para grupos, los miembros del grupo pueden
-  #   ejecutar y evaluar código; los invitados externos solo pueden ver la pregunta
-  #   a la que fueron invitados.
-  #   El indicador de awareness muestra:
-  #     - ID de la sala colaborativa y nº de participantes conectados.
-  #     - Lista de usuarios conectados (al pulsar en el nº de participantes).
-  #     - URL para compartir la sala (al pulsar en el ID).
-  #     - Botón "Unirme a la sala" para conectarse solo con el ID (sin URL).
+  # cómo entiendo yo esta funcionalidad (para que quede constancia de por qué
+  # escribo los pasos así):
+  #   cualquier usuario, profesor o estudiante, puede invitar a otros a escribir
+  #   código SQL juntos en tiempo real. si la actividad está configurada por
+  #   grupos, los miembros del grupo pueden ejecutar y evaluar código, mientras
+  #   que los invitados de fuera solo ven la pregunta a la que se les invitó.
+  #   el indicador de awareness debería enseñar:
+  #     - el ID de la sala y cuántos participantes hay conectados.
+  #     - la lista de usuarios conectados (al pulsar sobre el número).
+  #     - una URL para compartir la sala (al pulsar sobre el ID).
+  #     - un botón "Unirme a la sala" para entrar solo con el ID, sin necesitar la URL.
   #
-  # REQUISITO DE ENTORNO (servidor del tutor):
-  #   - Plugin mod_sqlab instalado y activo.
-  #   - Servidor PostgreSQL externo configurado y accesible.
-  #   - Actividad SQLab "Consultas básicas" en el curso BBDD con al menos una pregunta.
-  #   - Estudiantes student1 y student2 matriculados en el curso.
-  #   - Servidor WebSocket / backend colaborativo activo (si aplica configuración adicional).
+  # entorno necesario:
+  #   - mod_sqlab instalado y activo.
+  #   - PostgreSQL externo accesible.
+  #   - actividad "Consultas básicas" con al menos una pregunta.
+  #   - student1 y student2 matriculados (para poder simular más de un participante).
+  #   - el backend colaborativo (WebSocket) activo, si aplica.
   #
-  # Requiere @javascript: toda la funcionalidad colaborativa es dinámica.
+  # lleva @javascript porque toda la parte colaborativa es dinámica.
   #
-  # NOTA PARA EL TUTOR:
-  #   - Ajustar los literales "Unirme a la sala", "Participantes", "Sala" al texto real
-  #     de la interfaz definitiva del plugin.
-  #   - Si el botón de invitar tiene un texto o icono diferente, adaptar el paso
-  #     I press "Invitar" al selector correcto.
-  #   - Los escenarios de awareness (CU-11) verifican la presencia del indicador; 
-  #     para validar valores concretos (número de participantes), el tutor deberá
-  #     abrir una segunda sesión simultánea o adaptar el escenario.
+  # y como en el resto: el Background depende del generador de datos de
+  # mod_sqlab, que no existe, así que este fichero tampoco se ha podido ejecutar
+  # nunca. es el diseño más especulativo de todos porque encima describe una
+  # funcionalidad compleja (tiempo real, awareness) que ni siquiera he podido
+  # ver funcionando en la interfaz real. los literales "Unirme a la sala",
+  # "Participantes", "Sala" son mi mejor suposición, no texto confirmado.
+  # para los escenarios de awareness con nº de participantes reales haría falta
+  # además abrir dos sesiones simultáneas, cosa que Behat no hace por defecto.
 
   Background:
     Given the following "courses" exist:
@@ -51,7 +50,7 @@ Feature: FUN-10 Entorno colaborativo en mod_sqlab
       | activity | course | name              | intro                      | section |
       | sqlab    | BBDD   | Consultas básicas | Practica tus consultas SQL | 1       |
 
-  # CU-09a — El indicador de awareness (sala colaborativa) es visible en la actividad
+  # aquí solo compruebo que el indicador de sala/awareness aparece al entrar en la actividad
   Scenario: El estudiante ve el indicador de sala colaborativa al acceder a la actividad
     Given I log in as "student1"
     And I am on "BBDD" course homepage
@@ -60,7 +59,7 @@ Feature: FUN-10 Entorno colaborativo en mod_sqlab
     And I should not see "Fatal error"
     And I should not see "Warning:"
 
-  # CU-09b — La interfaz muestra el botón para unirse a una sala colaborativa
+  # aquí compruebo que el botón para unirse a una sala está presente en la interfaz
   Scenario: El estudiante ve el botón para unirse a una sala colaborativa
     Given I log in as "student1"
     And I am on "BBDD" course homepage
@@ -68,7 +67,9 @@ Feature: FUN-10 Entorno colaborativo en mod_sqlab
     Then I should see "Unirme a la sala"
     And I should not see "Fatal error"
 
-  # CU-10 — El estudiante puede unirse a una sala introduciendo su ID
+  # aquí pulso el botón y compruebo que se llega al formulario de unión mediante
+  # ID sin que salte ningún error PHP (no verifico la unión real, solo que el
+  # flujo de acceso al formulario funciona)
   Scenario: El estudiante puede acceder al formulario de unión a sala mediante ID
     Given I log in as "student1"
     And I am on "BBDD" course homepage
@@ -78,7 +79,8 @@ Feature: FUN-10 Entorno colaborativo en mod_sqlab
     And I should not see "Warning:"
     And I should not see "Notice:"
 
-  # CU-11a — El awareness muestra el número de participantes conectados
+  # aquí compruebo que se ve el número de participantes conectados (aunque sea
+  # solo el propio usuario, sin abrir una segunda sesión)
   Scenario: El indicador de participantes conectados es visible en la actividad
     Given I log in as "student1"
     And I am on "BBDD" course homepage
@@ -86,7 +88,8 @@ Feature: FUN-10 Entorno colaborativo en mod_sqlab
     Then I should see "Participantes"
     And I should not see "Fatal error"
 
-  # CU-11b — Al pulsar sobre el nº de participantes se muestra la lista de usuarios conectados
+  # aquí pulso sobre el número de participantes y compruebo que despliega la
+  # lista de conectados sin romper la página
   Scenario: El estudiante puede ver la lista de usuarios conectados en la sala
     Given I log in as "student1"
     And I am on "BBDD" course homepage
@@ -95,9 +98,10 @@ Feature: FUN-10 Entorno colaborativo en mod_sqlab
     Then I should not see "Fatal error"
     And I should not see "Warning:"
 
-  # CU-11c — Al pulsar sobre el ID de sala, la URL se copia al portapapeles (sin error PHP)
-  # NOTA: No es posible verificar el portapapeles desde Behat/Selenium.
-  # Este escenario verifica que la acción no genera errores PHP visibles.
+  # aquí quería comprobar que al pulsar el ID de sala se copia la URL al
+  # portapapeles, pero desde Behat/Selenium no hay forma de verificar el
+  # contenido del portapapeles, así que me conformo con comprobar que la
+  # acción no revienta la página con un error PHP
   Scenario: Pulsar en el ID de sala no genera errores PHP
     Given I log in as "student1"
     And I am on "BBDD" course homepage

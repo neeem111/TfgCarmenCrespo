@@ -1,24 +1,22 @@
 @mod @mod_sqlab @javascript
 Feature: FUN-08 Estudiante visualiza la puntuación obtenida tras ejecutar una consulta SQL
-  # Cubre:
-  # CU-06 — Estudiante: Ver la puntuación obtenida tras la ejecución
+  # esto cubre CU-06: que el estudiante vea la puntuación que ha sacado después
+  # de ejecutar su consulta SQL.
   #
-  # REQUISITO DE ENTORNO (servidor del tutor):
-  #   - Plugin mod_sqlab instalado y activo.
-  #   - Servidor PostgreSQL externo configurado, accesible y con la BD de la actividad cargada.
-  #   - Actividad SQLab "Consultas básicas" en el curso BBDD con al menos una pregunta
-  #     configurada con puntuación y criterio de evaluación definido.
-  #   - El estudiante student1 matriculado en el curso.
+  # entorno necesario:
+  #   - mod_sqlab instalado y activo.
+  #   - PostgreSQL externo accesible y con la BD de la actividad cargada.
+  #   - la actividad "Consultas básicas" con al menos una pregunta que tenga
+  #     puntuación y criterio de evaluación ya definidos.
+  #   - student1 matriculado.
   #
-  # Requiere @javascript: el editor SQL y los resultados de puntuación son dinámicos.
+  # lleva @javascript porque el editor y la puntuación se muestran de forma dinámica.
   #
-  # NOTA PARA EL TUTOR:
-  #   - Ajustar "SELECT * FROM empleados;" a una consulta correcta real para la actividad.
-  #   - Ajustar los textos "puntos", "Puntuación" al texto real de la interfaz del plugin.
-  #     Si el plugin muestra la nota en formato numérico (p. ej. "10/10", "100%"),
-  #     adaptar el Then I should see al formato correspondiente.
-  #   - Este escenario depende de CU-03 y CU-04: si la ejecución de SQL falla,
-  #     la puntuación no se mostrará. Ejecutar FUN-06 antes para verificar el prerequisito.
+  # ojo, este depende lógicamente de CU-03/CU-04 (FUN-06): si la ejecución de SQL
+  # no funciona, la puntuación tampoco se va a mostrar. y como FUN-06 tampoco se
+  # ha podido ejecutar (falta el generador de mod_sqlab), este tampoco. queda
+  # como diseño: los textos "puntos"/"Puntuación" son un placeholder, habría que
+  # adaptarlos al formato real (por ejemplo "10/10" o "100%") cuando se pueda probar.
 
   Background:
     Given the following "courses" exist:
@@ -34,7 +32,8 @@ Feature: FUN-08 Estudiante visualiza la puntuación obtenida tras ejecutar una c
       | activity | course | name              | intro                       | section |
       | sqlab    | BBDD   | Consultas básicas | Practica tus consultas SQL  | 1       |
 
-  # CU-06a — La puntuación es visible tras ejecutar una consulta correcta
+  # aquí compruebo el caso normal: ejecuto una consulta correcta y espero ver
+  # la puntuación reflejada en pantalla
   Scenario: El estudiante ve la puntuación obtenida tras ejecutar una consulta correcta
     Given I log in as "student1"
     And I am on "BBDD" course homepage
@@ -44,7 +43,8 @@ Feature: FUN-08 Estudiante visualiza la puntuación obtenida tras ejecutar una c
     Then I should see "puntos"
     And I should not see "Fatal error"
 
-  # CU-06b — La puntuación no genera errores PHP al mostrarse
+  # aquí me centro solo en la robustez: que mostrar la puntuación no rompa
+  # la página con errores PHP
   Scenario: La visualización de la puntuación no genera errores PHP
     Given I log in as "student1"
     And I am on "BBDD" course homepage
@@ -55,7 +55,9 @@ Feature: FUN-08 Estudiante visualiza la puntuación obtenida tras ejecutar una c
     And I should not see "Warning:"
     And I should not see "Notice:"
 
-  # CU-06c — La puntuación de una consulta incorrecta es 0 o inferior a la máxima
+  # y aquí pruebo el caso contrario, consulta con error de sintaxis, para
+  # comprobar al menos que no rompe nada (la comprobación de que la nota sea
+  # baja/cero de verdad la dejo pendiente de poder ver la interfaz real)
   Scenario: El estudiante ve que una consulta incorrecta obtiene puntuación baja o cero
     Given I log in as "student1"
     And I am on "BBDD" course homepage
