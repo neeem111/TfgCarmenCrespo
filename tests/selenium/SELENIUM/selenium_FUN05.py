@@ -1,18 +1,24 @@
 #!/usr/bin/env python3
 """
-selenium_FUN05.py — FUN-05: Profesor crea/configura actividad SQLab
-Cubre: CU-07 (profesor crea y configura actividad SQLab en el curso)
+selenium_FUN05.py — FUN-05: la profesora crea/configura una actividad SQLab
 
-Escenarios:
-  SC1 — SQLab disponible en el selector de actividades (como carmenprof)
-  SC2 — El formulario de configuración de la actividad existente contiene
-         los campos name, quizid y activitypassword (verificado en modedit.php)
+deriva de CU-07: comprobar que el profesor (aquí carmenprof) tiene disponible
+el plugin SQLab para añadirlo al curso, y que el formulario de configuración
+trae los campos propios del plugin.
 
-NOTA: SC2 NO crea una actividad nueva (requeriría un quizid real del sistema).
-      En su lugar abre el formulario de edición de la actividad existente (id=5)
-      y verifica que los campos de configuración del plugin son accesibles.
+escenarios:
+  SC1 — "SQLab" aparece en el selector de actividades cuando carmenprof
+        activa el modo edición
+  SC2 — el formulario de configuración de la actividad ya existente (id=5)
+        contiene los campos name, quizid y activitypassword
 
-Uso: python selenium_FUN05.py
+nota mía: en sc2 NO creo una actividad nueva de verdad (necesitaría un quizid
+real del sistema que no tengo a mano); en su lugar abro el formulario de
+edición de la actividad que ya existe y compruebo que esos campos están ahí
+y son accesibles — con eso me vale para confirmar que el plugin expone bien
+su configuración.
+
+uso: python selenium_FUN05.py
 """
 import sys, time
 from selenium import webdriver
@@ -89,7 +95,8 @@ def run(name, fn):
 # ── Escenarios ────────────────────────────────────────────────────────────────
 
 def sc1_sqlab_en_picker():
-    """carmenprof activa edición y verifica que SQLab aparece en el picker."""
+    """simulo a carmenprof activando edición y abriendo el selector de
+    "Añadir una actividad"; compruebo que "SQLab" aparece ahí como opción."""
     d = make_driver()
     try:
         login(d, PROF_USER, PROF_PASS)
@@ -111,11 +118,14 @@ def sc1_sqlab_en_picker():
 
 def sc2_formulario_configurable():
     """
-    Abre el formulario de edición de la actividad existente (modedit.php?update=5)
-    y verifica que los campos de configuración del plugin están presentes:
-      - name        (nombre de la actividad)
-      - quizid      (ID del cuestionario Moodle asociado)
-      - activitypassword (contraseña opcional)
+    abro el formulario de edición de la actividad ya existente
+    (modedit.php?update=5) como carmenprof y compruebo que los campos
+    propios de la configuración del plugin están ahí:
+      - name        (nombre de la actividad, estándar de moodle)
+      - quizid      (ID del cuestionario moodle asociado, obligatorio en sqlab)
+      - activitypassword (contraseña opcional de la actividad)
+    si name o quizid faltan, el test falla — activitypassword es opcional
+    así que solo lo anoto en el mensaje.
     """
     d = make_driver()
     try:

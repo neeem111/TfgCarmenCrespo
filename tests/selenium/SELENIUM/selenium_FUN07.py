@@ -1,26 +1,36 @@
 #!/usr/bin/env python3
 """
-selenium_FUN07.py — FUN-07: Estudiante navega entre preguntas
-Cubre: CU-05 (navegar entre preguntas de la actividad)
+selenium_FUN07.py — FUN-07: el estudiante navega entre preguntas
 
-El plugin ofrece dos vias de navegacion entre preguntas:
-  (a) el panel lateral "Navegacion de preguntas" (enlaces "Pregunta 1/2"...)
-  (b) los botones de paginacion "Siguiente pagina" / "Pagina anterior".
-Este script contrasta ambas: la via (a) funciona; la via (b) rompe la
-navegacion mas alla de la segunda pregunta, perdiendo el cmid y redirigiendo
-al "Area personal" con el mensaje «No se proporciono un ID de modulo de curso».
+deriva de CU-05 (navegar entre preguntas de la actividad). este es EL script
+que documenta un fallo real del plugin, no un fallo mío del test.
 
-Escenarios:
-  SC1 — El panel lateral muestra "Pregunta 1" y "Pregunta 2"
-  SC2 — Navegacion por el PANEL LATERAL funciona (PASS esperado)
-  SC3 — Botones "Siguiente pagina" por TODAS las preguntas (FAIL esperado:
-        detecta el punto y el tipo de ruptura)
-  SC4 — Boton "Pagina anterior"
-En cada paso se comprueba: que no se sale de la actividad, que no aparece el
-mensaje de navegacion rota, y que no hay errores PHP (requiere depuracion
-DEBUG_DEVELOPER activada en el servidor).
+el plugin ofrece dos vías para pasar de pregunta:
+  (a) el panel lateral "Navegación de preguntas" (los enlaces "Pregunta 1/2"...)
+  (b) los botones de paginación "Siguiente página" / "Página anterior"
 
-Uso: python selenium_FUN07.py
+lo que descubrí probando esto es que la vía (a) funciona perfectamente, pero
+la vía (b) rompe la navegación en cuanto pasas de la segunda pregunta: se
+pierde el cmid (course module id) por el camino y moodle te redirige al
+"área personal" con el mensaje «no se proporcionó un ID de módulo de curso».
+esto encaja con lo que vi también en PHPUnit (UNI-05e): el plugin usa
+optional_param() en vez de required_param() para el cmid, así que cuando el
+parámetro no llega en la petición de los botones, moodle no avisa con un
+error claro, simplemente te saca de la actividad. rediseñé este script
+justo para dejar constancia clara de ese fallo, escenario a escenario.
+
+escenarios:
+  SC1 — el panel lateral muestra "Pregunta 1" y "Pregunta 2" (visibilidad básica)
+  SC2 — navegar por el PANEL LATERAL funciona bien (aquí espero PASS)
+  SC3 — pulsar "Siguiente página" en todas las preguntas (aquí espero FAIL:
+        el test está diseñado para pillar el punto exacto y el tipo de rotura)
+  SC4 — botón "Página anterior" (misma vía rota que sc3)
+
+en cada paso compruebo: que no me saca de la actividad, que no aparece el
+mensaje de navegación rota, y que no hay errores PHP (para esto último hace
+falta tener DEBUG_DEVELOPER activado en el servidor).
+
+uso: python selenium_FUN07.py
 """
 import sys, time, hashlib
 from selenium import webdriver
@@ -163,6 +173,9 @@ def run(name, fn):
 # ── Escenarios ────────────────────────────────────────────────────────────────
 
 def sc1_panel_visible():
+    """comprobación básica: nada más entrar veo si el panel lateral muestra
+    ya "Pregunta 1" y "Pregunta 2". si esto falla, ni siquiera tiene sentido
+    seguir con la comparación de navegación."""
     d = driver()
     try:
         login(d, S1_USER, S1_PASS)
@@ -179,7 +192,10 @@ def sc1_panel_visible():
 
 
 def sc2_sidebar_funciona():
-    """La via que SI funciona: panel lateral 'Navegacion de preguntas'."""
+    """esta es la vía que SÍ funciona bien: uso el panel lateral para saltar
+    a "Pregunta 2" y compruebo que cambia de verdad de pregunta (comparo un
+    "marcador" antes/después) sin salir de la actividad ni romper nada.
+    aquí espero PASS siempre."""
     d = driver()
     try:
         login(d, S1_USER, S1_PASS)
@@ -198,7 +214,13 @@ def sc2_sidebar_funciona():
 
 
 def sc3_botones_siguiente():
-    """La via ROTA: botones 'Siguiente pagina'."""
+    """esta es la vía ROTA: voy pulsando "Siguiente página" pregunta a
+    pregunta hasta que se acaben o hasta que detecte el fallo (mensaje de
+    "ID de módulo de curso" ausente, o que me saque de la actividad). el
+    objetivo de este test no es que pase siempre, es documentar en qué
+    pregunta exacta se rompe la navegación por botones — eso es un fallo
+    real del plugin (cmid con optional_param en vez de required_param),
+    no un fallo del test."""
     d = driver()
     try:
         login(d, S1_USER, S1_PASS)
@@ -228,7 +250,9 @@ def sc3_botones_siguiente():
 
 
 def sc4_boton_anterior():
-    """La via ROTA: boton 'Pagina anterior'."""
+    """otra vía ROTA: me sitúo en "Pregunta 2" usando el panel lateral (la
+    vía fiable) y desde ahí pruebo "Página anterior", que tiene el mismo
+    problema de fondo que "Siguiente página" en sc3."""
     d = driver()
     try:
         login(d, S1_USER, S1_PASS)

@@ -1,14 +1,18 @@
 #!/usr/bin/env python3
 """
-selenium_FUN08.py — FUN-08: Visualización de la puntuación
-Cubre: CU-06 (ver puntuación obtenida tras ejecutar código)
+selenium_FUN08.py — FUN-08: visualización de la puntuación
 
-Escenarios:
-  SC1 — La sección "Puntúa como" es visible en la actividad
-  SC2 — "Evaluar código" no genera errores PHP
-  SC3 — SQL inválido + evaluar no genera error PHP
+deriva de CU-06 (ver la puntuación obtenida tras ejecutar código). básicamente
+compruebo que la actividad muestra la sección "puntúa como" y que evaluar
+código, tanto válido como inválido, no rompe nada por PHP.
 
-Uso: python selenium_FUN08.py
+escenarios:
+  SC1 — la sección "Puntúa como" es visible en la actividad
+  SC2 — "Evaluar código" con SQL válido no genera errores PHP y además
+        aparece feedback real (correcto/incorrecto/puntuación)
+  SC3 — lo mismo pero con SQL inválido: no debe petar por PHP
+
+uso: python selenium_FUN08.py
 """
 import sys, time
 from selenium import webdriver
@@ -109,7 +113,9 @@ def run(name, fn):
 # ── Escenarios ────────────────────────────────────────────────────────────────
 
 def sc1_puntuacion_visible():
-    # "Puntúa como 1.00" es visible directamente en la página (captura confirmada)
+    """compruebo que la sección de puntuación ("Puntúa como X.XX") está
+    visible al abrir la actividad — lo vi confirmado en captura de pantalla
+    real antes de escribir este check."""
     d1 = driver()
     try:
         login(d1, S1_USER, S1_PASS)
@@ -121,6 +127,10 @@ def sc1_puntuacion_visible():
         d1.quit()
 
 def sc2_evaluar_sin_errores():
+    """escribo SQL válido, pulso "Evaluar código" y compruebo dos cosas:
+    que no hay error PHP y que aparece feedback real de corrección
+    (correcto/incorrecto/puntuación) — no vale con que la página cargue,
+    quiero ver que el plugin de verdad puntuó algo."""
     d2 = driver()
     try:
         login(d2, S1_USER, S1_PASS)
@@ -142,6 +152,8 @@ def sc2_evaluar_sin_errores():
         d2.quit()
 
 def sc3_evaluar_sql_invalido():
+    """meto SQL roto y pulso "Evaluar código" — solo me importa que no salte
+    un error PHP feo, un mensaje de error SQL normal del backend está bien."""
     d3 = driver()
     try:
         login(d3, S1_USER, S1_PASS)

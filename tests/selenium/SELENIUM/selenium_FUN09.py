@@ -1,19 +1,26 @@
 #!/usr/bin/env python3
 """
-selenium_FUN09.py — FUN-09: Menú de diccionario de datos
-Cubre: CU-08 (consultar diccionario mediante el menú jerárquico de snippets)
+selenium_FUN09.py — FUN-09: menú jerárquico del diccionario de datos
 
-Escenarios:
-  SC1 — El botón del diccionario (aria-label confirmado del HTML real) es visible
-  SC2 — El menú se despliega sin errores PHP al interactuar con él
-  SC3 — Seleccionar "Schema list" inserta `select nspname from pg_namespace;` en el editor
+deriva de CU-08: el estudiante puede consultar el diccionario de datos
+(tablas, vistas, esquemas...) a través de un menú de snippets SQL sin salir
+del editor. aquí compruebo que el botón está, que el menú se abre sin petar,
+y que clicar un ítem realmente inserta SQL en el editor.
 
-SELECTORES CONFIRMADOS DEL HTML REAL:
-  Botón:     aria-label="Consultas del diccionario de datos"
-  Contenedor: id="vertical-menu-sqledi-snippet-menu-btn"
-  Ítems menú: "Schema list", "Tables", "Views" (en inglés, NO español)
+escenarios:
+  SC1 — el botón del diccionario es visible (uso su aria-label, que confirmé
+        mirando el HTML real de la actividad)
+  SC2 — el menú se despliega sin errores PHP
+  SC3 — al seleccionar "Schema list" se inserta en el editor la consulta
+        `select nspname from pg_namespace;`
 
-Uso: python selenium_FUN09.py
+apunte de selectores que confirmé inspeccionando el HTML real (por si algún
+día cambian y hay que retocar esto):
+  botón:      aria-label="Consultas del diccionario de datos"
+  contenedor: id="vertical-menu-sqledi-snippet-menu-btn"
+  ítems:      "Schema list", "Tables", "Views" — en inglés, ojo, NO en español
+
+uso: python selenium_FUN09.py
 """
 import sys, time
 from selenium import webdriver
@@ -117,11 +124,14 @@ def run(name, fn):
 # ── Escenarios ────────────────────────────────────────────────────────────────
 
 def sc1_diccionario_visible():
+    """compruebo que el botón del diccionario está en el DOM, buscando
+    primero por el aria-label real y, si no aparece, por el id del
+    contenedor como respaldo."""
     d1 = driver()
     try:
         login(d1, S1_USER, S1_PASS)
         start_attempt(d1)
-        # Verificar presencia por aria-label confirmado (selector primario)
+        # compruebo presencia por el aria-label confirmado (selector primario)
         btn_found = len(d1.find_elements(
             By.CSS_SELECTOR,
             '[aria-label="Consultas del diccionario de datos"]'
@@ -140,6 +150,8 @@ def sc1_diccionario_visible():
         d1.quit()
 
 def sc2_abrir_sin_errores():
+    """simulo el clic para abrir el menú y compruebo que no aparece ningún
+    error PHP tras la interacción."""
     d2 = driver()
     try:
         login(d2, S1_USER, S1_PASS)
@@ -153,10 +165,13 @@ def sc2_abrir_sin_errores():
 
 def sc3_snippet_en_editor():
     """
-    Confirma que seleccionar "Schema list" del menú inserta el snippet SQL.
-    Los ítems del menú son en INGLÉS: "Schema list", "Tables", "Views"
-    (confirmado del HTML real — NO "Tablas" en español).
-    Al clicar "Schema list" se inserta: select nspname from pg_namespace;
+    aquí compruebo lo importante de verdad: que clicar "Schema list" del
+    menú deja el SQL correspondiente metido en el editor. recuerda que los
+    ítems están en INGLÉS ("Schema list", "Tables", "Views" — no "Tablas"
+    en español, esto me confundió la primera vez que lo probé). si "Schema
+    list" no aparece, pruebo con "Tables" o "Views" como alternativa, porque
+    lo que quiero validar es que ALGÚN ítem inserta contenido, no un ítem
+    concreto a toda costa.
     """
     d3 = driver()
     try:

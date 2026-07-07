@@ -1,14 +1,17 @@
 #!/usr/bin/env python3
 """
-selenium_FUN04.py — FUN-04: Enunciado y resultados esperados
-Cubre: CU-02 (ver enunciado, resultados esperados, editor SQL)
+selenium_FUN04.py — FUN-04: enunciado, resultados esperados y editor SQL
 
-Escenarios:
-  SC1 — El enunciado (Pregunta 1) es visible al abrir la actividad
-  SC2 — La sección "Resultados esperados" es visible
-  SC3 — El editor SQL está presente en la página
+deriva de CU-02: al abrir la actividad, el estudiante tiene que ver el
+enunciado, los resultados que se esperan y el editor donde escribir SQL.
+aquí lo compruebo con student1 entrando a la actividad real (id=5).
 
-Uso: python selenium_FUN04.py
+escenarios:
+  SC1 — el enunciado (Pregunta 1) se ve al abrir la actividad
+  SC2 — la sección "Resultados esperados" está visible
+  SC3 — el editor SQL está presente (busco textarea, CodeMirror o el botón)
+
+uso: python selenium_FUN04.py
 """
 import sys, time
 from selenium import webdriver
@@ -77,6 +80,8 @@ def run(name, fn):
 # ── Escenarios ────────────────────────────────────────────────────────────────
 
 def sc1_enunciado():
+    """entro con student1, arranco el intento y compruebo que "Pregunta 1"
+    (el enunciado) aparece en la página."""
     d1 = driver()
     try:
         login(d1, S1_USER, S1_PASS)
@@ -87,6 +92,8 @@ def sc1_enunciado():
         d1.quit()
 
 def sc2_resultados_esperados():
+    """igual que sc1 pero busco el texto "Resultados esperados" — es la
+    sección que le dice al estudiante qué debería devolver su consulta."""
     d2 = driver()
     try:
         login(d2, S1_USER, S1_PASS)
@@ -97,6 +104,9 @@ def sc2_resultados_esperados():
         d2.quit()
 
 def sc3_editor_sql():
+    """aquí compruebo que hay editor SQL de alguna forma: un textarea plano,
+    un CodeMirror (el editor "bonito" con resaltado), o al menos el botón de
+    "Ejecutar código". con que aparezca uno de los tres me vale."""
     d3 = driver()
     try:
         login(d3, S1_USER, S1_PASS)

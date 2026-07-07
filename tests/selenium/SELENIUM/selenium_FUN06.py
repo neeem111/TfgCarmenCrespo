@@ -1,17 +1,23 @@
 #!/usr/bin/env python3
 """
-selenium_FUN06.py — FUN-06: Estudiante ejecuta consulta SQL y recibe feedback
-Cubre: CU-03 (escribir y ejecutar consulta), CU-04 (ver feedback éxito/error)
+selenium_FUN06.py — FUN-06: el estudiante ejecuta SQL y recibe feedback
 
-Escenarios:
-  SC1 — "Ejecutar código" no produce errores PHP
-  SC2 — "Evaluar código" no produce errores PHP
-  SC3 — SQL sintácticamente inválido no produce error PHP visible
+deriva de CU-03 (escribir y ejecutar una consulta) y CU-04 (ver el feedback
+de éxito/error). aquí lo que hago es escribir SQL en el editor con JS
+(execute_script, para no depender de que el CodeMirror capture bien las
+pulsaciones) y pulsar los botones de "Ejecutar código" / "Evaluar código".
 
-NOTA: Para verificar "Correcto"/"Incorrecto" sustituye SQL_OK por la solución
-      real de la actividad (trigger/procedimiento que resuelve la pregunta).
+escenarios:
+  SC1 — "Ejecutar código" con una consulta válida no rompe nada por PHP
+  SC2 — "Evaluar código" tampoco genera errores PHP
+  SC3 — meto SQL inválido a propósito y compruebo que el backend lo gestiona
+        sin petar (aunque devuelva su propio mensaje de error SQL, eso es lo
+        esperado; lo que no quiero ver es un error PHP del servidor)
 
-Uso: python selenium_FUN06.py
+nota mía: para comprobar de verdad "Correcto"/"Incorrecto" habría que meter
+la solución real del ejercicio en SQL_OK en vez de un SELECT de relleno.
+
+uso: python selenium_FUN06.py
 """
 import sys, time
 from selenium import webdriver
@@ -109,6 +115,9 @@ def run(name, fn):
 # ── Escenarios ────────────────────────────────────────────────────────────────
 
 def sc1_ejecutar_codigo():
+    """escribo un SQL válido, pulso "Ejecutar código" y compruebo que aparece
+    algún resultado en la página (no solo que no hay error PHP, sino que el
+    backend realmente devolvió algo procesado)."""
     d1 = driver()
     try:
         login(d1, S1_USER, S1_PASS)
@@ -130,6 +139,8 @@ def sc1_ejecutar_codigo():
         d1.quit()
 
 def sc2_evaluar_codigo():
+    """lo mismo que sc1 pero pulsando "Evaluar código" — solo compruebo que
+    no hay error PHP, sin exigir un feedback concreto (eso ya lo mira FUN-08)."""
     d2 = driver()
     try:
         login(d2, S1_USER, S1_PASS)
@@ -143,6 +154,9 @@ def sc2_evaluar_codigo():
         d2.quit()
 
 def sc3_sql_invalido():
+    """meto SQL roto a propósito (SQL_BAD) para ver que el plugin no se cae
+    con un error PHP feo — un error de sintaxis SQL "normal" del backend
+    está bien, lo que busco descartar es un fallo del propio servidor."""
     d3 = driver()
     try:
         login(d3, S1_USER, S1_PASS)

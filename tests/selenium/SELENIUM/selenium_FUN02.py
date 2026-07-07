@@ -1,13 +1,17 @@
 #!/usr/bin/env python3
 """
-selenium_FUN02.py — FUN-02: Estudiante accede a una actividad SQLab
-Cubre: CU-01 (acceder a actividad SQLab desde el curso)
+selenium_FUN02.py — FUN-02: el estudiante accede a una actividad SQLab
 
-Escenarios:
-  SC1 — Actividad "actividad grupal" (SQLab) visible en la lista del curso
-  SC2 — Estudiante abre la actividad sin errores PHP
+esto deriva de CU-01 (acceder a la actividad SQLab desde el curso). la idea
+es sencilla: entro como student1, compruebo que la actividad se ve en el
+curso con su enlace correcto a mod/sqlab, y que al abrirla no explota nada
+por PHP.
 
-Uso: python selenium_FUN02.py
+escenarios:
+  SC1 — la actividad "actividad grupal" (SQLab) aparece en la lista del curso
+  SC2 — student1 abre la actividad y no hay errores PHP de por medio
+
+uso: python selenium_FUN02.py
 """
 import sys, time
 from selenium import webdriver
@@ -81,11 +85,14 @@ def run(name, fn):
 # ── Escenarios ────────────────────────────────────────────────────────────────
 
 def sc1_actividad_visible_en_curso():
+    """entro al curso como student1 y compruebo dos cosas a la vez: que el
+    nombre de la actividad aparece tal cual, y que el enlace apunta de
+    verdad a mod/sqlab (no vale con que el texto esté, tiene que ser SQLab)."""
     d = make_driver()
     try:
         login(d, S1_USER, S1_PASS)
         d.get(COURSE_URL)
-        # Verificar nombre exacto de la actividad Y que enlaza a /mod/sqlab/
+        # compruebo el nombre exacto de la actividad y que enlaza a /mod/sqlab/
         nombre_ok = see(d, ACTIVITY_NAME, 8)
         link_ok = "/mod/sqlab/" in d.page_source
         ok = nombre_ok and link_ok
@@ -95,6 +102,9 @@ def sc1_actividad_visible_en_curso():
         d.quit()
 
 def sc2_abrir_actividad_sin_errores():
+    """simulo que student1 le da a "comenzar/continuar intento" y compruebo
+    que aterriza en la página de intento (attempt.php) sin ningún error PHP
+    visible en el HTML."""
     d = make_driver()
     try:
         login(d, S1_USER, S1_PASS)

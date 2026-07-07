@@ -1,14 +1,19 @@
 #!/usr/bin/env python3
 """
-selenium_FUN01.py — FUN-01: Acceso al curso y verificación de roles
-Cubre: Requisito de roles y permisos (no deriva de un caso de uso)
+selenium_FUN01.py — FUN-01: acceso al curso y comprobación de roles/permisos
 
-Escenarios:
-  SC1 — Estudiante matriculado puede acceder al curso y ve la actividad SQLab
-  SC2 — Profesor (carmenprof) puede activar el modo edición
-  SC3 — Estudiante NO puede activar el modo edición
+este script no deriva de un caso de uso concreto, sino del requisito general
+de roles y permisos: quiero comprobar que moodle+sqlab respetan quién puede
+ver y quién puede editar. lo hago con dos usuarios reales (student1 y
+carmenprof) contra el servidor de la UCLM, en remoto vía VPN.
 
-Uso: python selenium_FUN01.py
+escenarios:
+  SC1 — el estudiante matriculado entra al curso y ve la actividad SQLab
+  SC2 — la profesora (carmenprof) sí puede activar el modo edición
+  SC3 — el estudiante NO puede activar el modo edición (ojo aquí: si esto
+        falla es un fallo de permisos serio, no un problema del test)
+
+uso: python selenium_FUN01.py
 """
 import sys, time
 from selenium import webdriver
@@ -68,11 +73,13 @@ def run(name, fn):
 # ── Escenarios ────────────────────────────────────────────────────────────────
 
 def sc1_estudiante_accede():
+    """simulo a student1 entrando al curso: aquí compruebo que ve el nombre
+    del curso y la actividad SQLab, y que no salta ningún error PHP raro."""
     d = make_driver()
     try:
         login(d, S1_USER, S1_PASS)
         d.get(COURSE_URL)
-        # Verifica que el estudiante ve el curso y la actividad SQLab
+        # compruebo que el estudiante ve el curso y la actividad SQLab
         curso_ok = see(d, "BBDD", 8)
         actividad_ok = see(d, ACTIVITY_NAME, 8)
         php_err = any(e in d.page_source for e in ["Fatal error", "Warning:", "Notice:"])
@@ -83,12 +90,16 @@ def sc1_estudiante_accede():
         d.quit()
 
 def sc2_profesor_activa_edicion():
+    """aquí simulo a carmenprof entrando al curso y pulsando el botón/toggle
+    de "activar edición". pruebo varias etiquetas porque el texto cambia
+    según idioma/versión de moodle. al final compruebo que el modo edición
+    quedó realmente activo (no solo que hice clic en algo)."""
     d = make_driver()
     try:
         login(d, PROF_USER, PROF_PASS)
         d.get(COURSE_URL)
         time.sleep(2)
-        # Activar modo edición
+        # intento activar el modo edición probando varias etiquetas posibles
         activated = False
         for label in ["Turn editing on", "Activar edición", "Edit mode"]:
             try:
@@ -119,6 +130,9 @@ def sc2_profesor_activa_edicion():
         d.quit()
 
 def sc3_estudiante_no_puede_editar():
+    """el contrapunto de sc2: entro como student1 y compruebo que NO aparece
+    ningún botón de edición. si esto falla es que hay un fallo real de
+    permisos en el plugin/moodle, no un fallo del propio test."""
     d = make_driver()
     try:
         login(d, S1_USER, S1_PASS)

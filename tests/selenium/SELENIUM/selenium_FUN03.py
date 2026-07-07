@@ -1,18 +1,26 @@
 #!/usr/bin/env python3
 """
-selenium_FUN03.py — FUN-03: Plugin mod_sqlab correctamente instalado
-Cubre: instalación correcta, sin errores PHP, plugin habilitado
+selenium_FUN03.py — FUN-03: plugin mod_sqlab correctamente instalado (panel admin)
 
-Escenarios:
-  SC1 — Plugin "SQLab" aparece en Manage activities (texto confirmado del HTML real)
-  SC2 — Página de admin sin errores PHP
-  SC3 — Plugin no aparece como no instalado/faltante
+esto deriva del requisito de instalación: quería comprobar desde el panel de
+administración de moodle que el plugin aparece bien instalado y sin errores.
 
-NOTA: Requiere credenciales de admin, no disponibles en este trabajo -> EXCLUIDO
-      del alcance ejecutado. La instalacion se verifica con PHPUnit (UNI-02a).
-      Confirmado por Behat: "sqlab" en minúsculas NO aparece → el texto es "SQLab".
+ojo, importante: este script lo diseñé pero AL FINAL NUNCA LO LLEGUÉ A EJECUTAR.
+toda la funcionalidad de administrador quedó fuera del alcance real del
+proyecto (no tenía credenciales de admin de verdad en el entorno de la UCLM,
+solo unas de prueba que puse aquí como placeholder). la instalación del
+plugin la acabé verificando por otra vía: el test PHPUnit UNI-02a. así que
+este fichero se queda como diseño/borrador, no como evidencia de ejecución.
 
-Uso: python selenium_FUN03.py
+escenarios (pensados, no verificados en remoto):
+  SC1 — el texto "SQLab" aparece en "Manage activities" (ojo: es "SQLab" con
+        mayúscula, "sqlab" en minúsculas NO aparece — esto lo descubrí en su
+        día gracias a que Behat fallaba buscando el texto en minúsculas)
+  SC2 — la página de admin no tiene errores PHP
+  SC3 — el plugin no aparece marcado como "no instalado" o "falta en disco"
+
+uso: python selenium_FUN03.py  (recuerda: necesita credenciales de admin reales,
+     que no tuve disponibles — por eso nunca se corrió contra el servidor)
 """
 import sys, time
 from selenium import webdriver
@@ -70,13 +78,16 @@ def run(name, fn):
 # ── Escenarios ────────────────────────────────────────────────────────────────
 
 def sc1_plugin_en_lista():
+    """aquí simularía entrar como admin a "Manage activities" y comprobar que
+    "SQLab" aparece en la lista de módulos instalados. NUNCA SE EJECUTÓ contra
+    el servidor real por falta de credenciales de admin — se queda en diseño."""
     d = make_driver()
     try:
         login(d, ADMIN_USER, ADMIN_PASS)
         d.get(ADMIN_MODULES)
         time.sleep(2)
-        # CORRECCIÓN: el texto en la UI es "SQLab" (capitalizado), NO "sqlab"
-        # Confirmado por el output de Behat: step "I should see 'sqlab'" FAILED
+        # ojo: el texto en la UI es "SQLab" (con mayúscula), NO "sqlab" en minúsculas
+        # esto lo até gracias a que un step de Behat que buscaba "sqlab" fallaba
         ok = see(d, "SQLab", 8)
         return ok, ("Plugin 'SQLab' presente en Manage Activities"
                     if ok else "FALLO: 'SQLab' NO encontrado en la lista de módulos")
@@ -84,6 +95,9 @@ def sc1_plugin_en_lista():
         d.quit()
 
 def sc2_sin_errores_php():
+    """comprobaría que la página de administración de módulos no muestra
+    ningún error/warning PHP. como el resto de FUN-03, diseñado pero no
+    ejecutado (sin acceso admin real)."""
     d = make_driver()
     try:
         login(d, ADMIN_USER, ADMIN_PASS)
@@ -96,6 +110,9 @@ def sc2_sin_errores_php():
         d.quit()
 
 def sc3_plugin_habilitado():
+    """comprobaría que el plugin no aparece marcado como "not installed" o
+    "missing from disk". igual que sc1/sc2: quedó en diseño, la instalación
+    real se validó al final con el PHPUnit UNI-02a."""
     d = make_driver()
     try:
         login(d, ADMIN_USER, ADMIN_PASS)
@@ -109,7 +126,10 @@ def sc3_plugin_habilitado():
     finally:
         d.quit()
 
-# ── Main ──────────────────────────────────────────────────────────────────────
+# ── Main ─────────────────────────────────────────────────────────────────────
+# recordatorio: este script quedó como diseño, nunca se ejecutó contra el
+# servidor real por falta de credenciales de admin (ver docstring de cabecera).
+# la verificación de instalación real se hizo con el PHPUnit UNI-02a.
 
 if __name__ == "__main__":
     print("═" * 60)

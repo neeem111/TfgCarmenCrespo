@@ -1,29 +1,40 @@
 #!/usr/bin/env python3
 """
-selenium_FUN11.py v8 — FUN-11: Demo integral del entorno colaborativo SQLab
+selenium_FUN11.py v8 — FUN-11: demo integral del entorno colaborativo SQLab
 =============================================================================
-NARRATIVA DEL VIDEO (historia coherente para el tribunal):
+este es el script grande: la demostración integrada que toca prácticamente
+todos los casos de uso a la vez, validando la sesión colaborativa en tiempo
+real. lanzo dos navegadores en paralelo (dos hilos, uno por student1 y otro
+por student2), sincronizados con threading.Event para que cada uno espere su
+turno en el momento justo de la narrativa (esto es justo lo que Behat, al
+ser monohilo, no podía hacer). cubre los escenarios SC1 a SC12.
 
-  1. Ambos leen el enunciado del ejercicio
-     - student1 expande la seccion "Pistas"
+narrativa del vídeo (una historia con sentido para que el tribunal la siga):
+
+  1. ambos leen el enunciado del ejercicio
+     - student1 expande la sección "Pistas"
      - student2 expande "Conceptos relacionados"
-  2. student1 comprueba la UI: awareness (SC2), modal (SC3), ID sala (SC4),
-     diccionario SQL (SC5/SC7)
+  2. student1 comprueba la UI: awareness (SC2), modal de participantes (SC3),
+     ID de sala (SC4), botón y submenús del diccionario SQL (SC5/SC7)
   3. SC6: student1 usa el diccionario SQL -> clic en "Tables"
-          -> se copia automaticamente un SELECT al portapapeles
-          -> se pega en el editor -> student2 lo ve aparecer (sync WS)
+          -> se copia automáticamente un SELECT
+          -> se pega en el editor -> student2 lo ve aparecer en tiempo real (sync WS)
   4. student2 sustituye el snippet por una query concreta (S2_COMPLETED)
-  5. student2 evalua -> ERROR: relation "vpract10_ej1" does not exist
+  5. student2 evalúa -> ERROR: relation "vpract10_ej1" does not exist (a propósito,
+     para comprobar que el error de evaluación cruzada se ve bien)
   6. student1 corrige la query usando la tabla real "articulo"
-  7. student2 evalua la version corregida
-  8. Ambos navegan a Pregunta 2 y hacen clic en Terminar intento
-     -> Enviar todo y terminar -> pagina de revision -> fin del video
+  7. student2 evalúa la versión corregida
+  8. ambos navegan a Pregunta 2 (por el panel lateral, que es la vía que
+     funciona según lo que descubrí en FUN-07 — la de botones NO funciona)
+     y hacen clic en "Terminar intento" -> "Enviar todo y terminar" ->
+     página de revisión -> fin del vídeo
 
-Cambios v8:
-  - Sin emojis en ninguna cadena de texto
-  - SC6 activo: use_dict_snippet() abre el dict, hace clic en "Tables",
-    intercepta el SQL copiado al portapapeles y lo pega en CM6
-  - COLLAB A: student1 usa el snippet del diccionario en vez de type_slowly
+cambios v8:
+  - sin emojis en ninguna cadena de texto (para que se vea limpio en consola)
+  - SC6 activo de verdad: use_dict_snippet() abre el diccionario, hace clic
+    en "Tables", coge el SQL directamente del data-sql del elemento y lo
+    pega en el editor (CM6)
+  - COLLAB A: student1 usa el snippet del diccionario en vez de escribirlo a mano
 """
 import sys, time, threading
 from selenium import webdriver
@@ -360,11 +371,13 @@ def type_slowly(d, sql, delay=TYPING_DELAY):
 
 def use_dict_snippet(d, item_text=DICT_ITEM):
     """
-    SC6: Abre el menu diccionario y hace clic en un item con atributo data-sql.
-    El plugin almacena el SQL directamente en data-sql del elemento <a class="v-menu-item">.
-    Lo leemos de ahi (sin depender del portapapeles) y lo insertamos en CM6
-    via execCommand -> dispara eventos de CM6 -> sync WS con student2.
-    Retorna (ok: bool, snippet: str).
+    SC6: abro el menú del diccionario y hago clic en un ítem con atributo
+    data-sql. el plugin guarda el SQL directamente en data-sql del elemento
+    <a class="v-menu-item">, así que lo leo de ahí en vez de depender del
+    portapapeles del sistema (que en remoto vía VPN es un lío). luego lo
+    inserto en el editor (CM6) con execCommand para que dispare los eventos
+    de CodeMirror y así se propague por WebSocket a student2.
+    devuelve (ok: bool, snippet: str).
     """
     scroll_to_cm(d)
     time.sleep(0.5)
@@ -553,9 +566,12 @@ def has_error_msg(d):
 
 def navigate_to_next_question(d, user_label, bg_color):
     """
-    Navega a Pregunta 2 haciendo clic en su enlace de la seccion
-    'Navegacion de preguntas' (href con page=1).
-    Fallback: cambia page=0->page=1 en la URL actual.
+    SC11: navego a Pregunta 2 haciendo clic en su enlace del panel lateral
+    "Navegación de preguntas" (con page=1 en el href). uso esta vía a
+    propósito porque es la que funciona bien (según lo que descubrí en
+    FUN-07, los botones de "siguiente página" rompen la navegación).
+    si no encuentro el enlace, hay un fallback tosco cambiando page=0 por
+    page=1 directamente en la URL.
     """
     set_phase(d, "Clic en 'Pregunta 2' (navegacion de preguntas)...")
 
@@ -595,11 +611,12 @@ def navigate_to_next_question(d, user_label, bg_color):
 
 def terminar_intento(d):
     """
-    Flujo de cierre:
-      1. Clic en 'Terminar intento...' (button con onclick=redirectToSummary)
-      2. En la pagina de resumen, clic en 'Enviar todo y terminar'
-         (<a class="mod_quiz-next-nav btn btn-primary"> o link a processattempt.php)
-      3. Pausa en la pagina de revision final -> fin del video
+    SC12: cierro el intento en tres pasos:
+      1. clic en "Terminar intento..." (botón con onclick=redirectToSummary)
+      2. en la página de resumen, clic en "Enviar todo y terminar"
+         (busco por <a class="mod_quiz-next-nav"> o por el link a processattempt.php)
+      3. dejo una pausa en la página de revisión final para que el vídeo
+         termine ahí, con la evidencia visible en pantalla
     """
     set_phase(d, "Terminando intento...")
 
@@ -658,6 +675,12 @@ def terminar_intento(d):
 UL1, BG1 = "< STUDENT 1", "#1565C0"
 
 def _s1_thread():
+    """hilo de student1 (ventana izquierda). recorre casi toda la narrativa
+    en primera persona: crea la sala, lee el enunciado, comprueba awareness/
+    modal/ID de sala/diccionario, pega el snippet SQL para que lo vea
+    student2, corrige el SQL cuando student2 falla, y termina navegando a
+    la pregunta 2 y cerrando el intento. va marcando eventos (threading.Event)
+    para avisar a student2 de en qué punto está."""
     d = make_driver(pos_x=0)
     try:
         narrate("student1", "Login...")
@@ -852,6 +875,12 @@ def _s1_thread():
 UL2, BG2 = "STUDENT 2 >", "#2E7D32"
 
 def _s2_thread():
+    """hilo de student2 (ventana derecha). espera a que student1 cree la
+    sala, se une con el room_id, se coloca mirando el editor para comprobar
+    en directo que ve aparecer el snippet de student1 (SC8, la prueba de
+    sincronización de verdad), lo sustituye por una query que falla a
+    propósito, evalúa el error, espera la corrección de student1 y la
+    vuelve a evaluar. termina igual que student1: pregunta 2 y cerrar intento."""
     d = make_driver(pos_x=HALF_W)
     try:
         narrate("student2", "Login...")
@@ -1024,6 +1053,9 @@ def _s2_thread():
 # =============================================================================
 
 def run_session():
+    """resetea el estado compartido y lanza los dos hilos (student1 primero,
+    student2 4 segundos después para darle margen a que la sala exista),
+    esperando a que ambos terminen (o hagan timeout a los 300s)."""
     shared.update({
         "room_id": None,
         "room_ready":        threading.Event(),

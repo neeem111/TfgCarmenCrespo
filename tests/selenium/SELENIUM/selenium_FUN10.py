@@ -1,17 +1,26 @@
 #!/usr/bin/env python3
 """
-selenium_FUN10.py — FUN-10: Entorno colaborativo
-Cubre: CU-09 (crear sala), CU-10 (unirse), CU-11 (awareness/participantes)
+selenium_FUN10.py — FUN-10: entorno colaborativo (crear sala, unirse, awareness)
 
-Escenarios:
-  SC1 — "Sala" y campo "Escriba el ID de la sala" visibles
-  SC2 — Botón "Unirme a la sala" visible
-  SC3 — "Participantes conectados" visible (awareness activo)
-  SC4 — room_id extraíble del texto "Conectando a sala ID: XXXX"
-  SC5 — Formulario de unión accesible sin errores PHP
-  SC6 — DOS USUARIOS SIMULTÁNEOS: student1 crea sala, student2 se une con el ID
+deriva de tres casos de uso relacionados: CU-09 (crear sala), CU-10 (unirse a
+una sala existente por ID) y CU-11 (awareness — ver quién más está conectado).
+este es el primer script donde meto DOS usuarios de verdad en paralelo con
+threading, porque para probar "unirse a una sala" necesito que alguien la
+haya creado antes. es justo el tipo de escenario que Behat no podía cubrir
+por ser monohilo (no puede tener dos sesiones de navegador vivas a la vez).
 
-Uso: python selenium_FUN10.py
+escenarios:
+  SC1 — se ve el texto "Sala" y el input para escribir el ID de sala
+  SC2 — el botón "Unirme a la sala" es visible
+  SC3 — "Participantes conectados" es visible (awareness activo)
+  SC4 — puedo extraer el room_id real desde el elemento #room-id-display
+  SC5 — el formulario de unión es accesible y no da errores PHP
+  SC6 — el escenario gordo: DOS USUARIOS SIMULTÁNEOS. student1 crea la sala
+        en un hilo, student2 se une con ese ID en otro hilo, sincronizados
+        con un threading.Event para que student2 no intente unirse antes de
+        que exista la sala
+
+uso: python selenium_FUN10.py
 """
 import re, sys, time, threading
 from selenium import webdriver
@@ -130,11 +139,13 @@ def run(name, fn):
 # ── Escenarios de un solo usuario ─────────────────────────────────────────────
 
 def sc1_sala_visible():
+    """entro con student1 y compruebo que el texto "Sala" y el input real
+    (#roomidtext) están en la página."""
     d1 = driver()
     try:
         login(d1, S1_USER, S1_PASS)
         start_attempt(d1)
-        # Verificar por IDs reales del HTML (confirmados)
+        # compruebo por los IDs reales del HTML (confirmados inspeccionando la página)
         sala_text = see(d1, "Sala", 8) or see(d1, "sala", 5)
         input_ok = len(d1.find_elements(By.ID, "roomidtext")) > 0
         err = next((e for e in PHP_ERRORS if e in d1.page_source), None)
@@ -145,6 +156,8 @@ def sc1_sala_visible():
         d1.quit()
 
 def sc2_boton_unirme():
+    """compruebo que el botón "Unirme a la sala" está, buscando primero por
+    su id real (#btn-connect) y si no por el texto."""
     d2 = driver()
     try:
         login(d2, S1_USER, S1_PASS)
@@ -159,6 +172,8 @@ def sc2_boton_unirme():
         d2.quit()
 
 def sc3_participantes_conectados():
+    """solo miro que aparece "Participantes conectados", que es la señal de
+    que el awareness (saber quién está en la sala) está activo en la UI."""
     d3 = driver()
     try:
         login(d3, S1_USER, S1_PASS)
@@ -169,6 +184,9 @@ def sc3_participantes_conectados():
         d3.quit()
 
 def sc4_room_id_extraible():
+    """compruebo que puedo sacar el room_id real del elemento
+    #room-id-display — esto es clave porque sc6 lo necesita para que
+    student2 pueda unirse a la sala de student1."""
     d4 = driver()
     try:
         login(d4, S1_USER, S1_PASS)
@@ -180,6 +198,9 @@ def sc4_room_id_extraible():
         d4.quit()
 
 def sc5_formulario_union():
+    """pulso el botón de unirme sin haber puesto ningún ID (a propósito) para
+    ver que el plugin gestiona bien ese caso raro con una alerta JS en vez de
+    petar con un error PHP. si sale un alert, lo descarto y sigo."""
     d5 = driver()
     try:
         login(d5, S1_USER, S1_PASS)
@@ -212,8 +233,15 @@ def sc5_formulario_union():
         d5.quit()
 
 # ── Escenario 2 usuarios simultáneos (threading) ─────────────────────────────
+# aquí es donde de verdad necesito dos navegadores vivos al mismo tiempo —
+# esto era justo lo que Behat no podía hacer al ser monohilo. uso dos threads
+# y un threading.Event para que student2 espere a que exista la sala antes
+# de intentar unirse.
 
 def _s1_thread():
+    """hilo de student1: crea/entra en la sala, guarda el room_id en el dict
+    compartido y avisa a student2 (vía room_ready) de que ya puede unirse.
+    luego espera un rato y refresca para comprobar que ve a student2 conectado."""
     d = driver()
     try:
         login(d, S1_USER, S1_PASS)
@@ -236,6 +264,9 @@ def _s1_thread():
         d.quit()
 
 def _s2_thread():
+    """hilo de student2: espera a que student1 haya creado la sala
+    (room_ready), mete el ID en el input real y pulsa unirme. si algo falla
+    lo deja anotado en shared["s2_error"] para que sc6 lo reporte."""
     d = driver()
     try:
         login(d, S2_USER, S2_PASS)
@@ -293,6 +324,10 @@ def _s2_thread():
         d.quit()
 
 def sc6_dos_usuarios():
+    """lanzo los dos hilos (con un pequeño retraso para que student1 vaya
+    primero) y compruebo al final que student2 consiguió unirse a la misma
+    sala que creó student1. si algo se queda colgado, los timeouts de
+    join() evitan que el script se quede esperando para siempre."""
     shared["room_id"] = None
     shared["room_ready"] = threading.Event()
     shared["s1_joined"] = shared["s2_joined"] = False
