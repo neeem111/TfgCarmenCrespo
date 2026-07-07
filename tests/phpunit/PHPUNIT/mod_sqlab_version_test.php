@@ -29,6 +29,7 @@
  *   UNI-02d [C] sqlab_delete_instance() BORRA el registro de mdl_sqlab
  *   UNI-02e [C] sqlab_update_instance() MODIFICA el registro en mdl_sqlab
  *   UNI-02f [SKIPPED] sqlab_add_instance() — dependencia qtype_sqlquestion
+ *   UNI-02g [C] set_config()/get_config() almacenan en config_plugins
  *
  * === CÓMO EJECUTAR ===
  *   SIEMPRE por fichero individual. Nunca con --group mod_sqlab.
@@ -271,6 +272,53 @@ class mod_sqlab_version_test extends advanced_testcase {
         $this->markTestSkipped(
             'LIMITACIÓN ARQUITECTÓNICA: sqlab_add_instance() requiere quiz->id y qtype_sqlquestion. ' .
             'El comportamiento de escritura y borrado en mdl_sqlab se verifica en UNI-02d y UNI-02e.'
+        );
+    }
+
+    /**
+     * UNI-02g [C] — COMPORTAMIENTO: la configuración del plugin se almacena en config_plugins.
+     *
+     * Requisito verificado: Obligatorio — las configuraciones del plugin deben
+     * guardarse en la tabla config_plugins (mediante set_config()/get_config()),
+     * y no directamente en la tabla config principal ni en $CFG.
+     *
+     * El plugin ya usa get_config('mod_sqlab', 'dbhost') en su lógica real
+     * (véase classes/database_manager.php), por lo que este test confirma que
+     * dicho mecanismo persiste correctamente en config_plugins.
+     */
+    public function test_settings_stored_in_config_plugins(): void {
+        global $DB;
+        $this->resetAfterTest();
+
+        $key   = 'dbhost';
+        $value = 'valor_de_prueba_' . uniqid();
+
+        // Paso 1: escribir la configuración mediante la API de Moodle.
+        set_config($key, $value, 'mod_sqlab');
+
+        // Paso 2: comprobar que get_config() la recupera correctamente.
+        $this->assertEquals(
+            $value,
+            get_config('mod_sqlab', $key),
+            'get_config(\'mod_sqlab\', \'' . $key . '\') no devolvió el valor esperado.'
+        );
+
+        // Paso 3: comprobar directamente en BD que se guardó en config_plugins
+        // (y no en la tabla config principal).
+        $record = $DB->get_record('config_plugins', [
+            'plugin' => 'mod_sqlab',
+            'name'   => $key,
+        ]);
+
+        $this->assertNotEmpty(
+            $record,
+            'FALLO: no se encontró el registro en mdl_config_plugins para mod_sqlab/' . $key . '. ' .
+            'La configuración del plugin no se está almacenando donde exige Moodle.'
+        );
+        $this->assertEquals(
+            $value,
+            $record->value,
+            'El valor almacenado en config_plugins no coincide con el escrito mediante set_config().'
         );
     }
 
