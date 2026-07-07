@@ -1,4 +1,4 @@
-# TFG — Requisitos de calidad software para la publicación de plugins en Moodle
+# TFG — Requisitos de calidad software en Moodle
 
 > **Autora:** Carmen Crespo Navarro
 > **Tutor:** Jesús Damián García-Consuegra Bleda
