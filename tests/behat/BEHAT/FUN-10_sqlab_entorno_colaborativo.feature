@@ -1,9 +1,9 @@
 @mod @mod_sqlab @javascript
 Feature: FUN-10 Entorno colaborativo en mod_sqlab
   # Cubre:
-  # CU-10 — Usuario (profesor o estudiante): Crear e invitar a otros a una sesión colaborativa
-  # CU-11 — Usuario: Unirse a una sala colaborativa mediante ID
-  # CU-12 — Usuario: Ver el indicador de awareness (ID sala, participantes conectados)
+  # CU-09 — Usuario (profesor o estudiante): Crear e invitar a otros a una sesión colaborativa
+  # CU-10 — Usuario: Unirse a una sala colaborativa mediante ID
+  # CU-11 — Usuario: Ver el indicador de awareness (ID sala, participantes conectados)
   #
   # DESCRIPCIÓN DE LA FUNCIONALIDAD:
   #   Cualquier usuario (profesor o estudiante) puede invitar a otros a una sesión
@@ -31,7 +31,7 @@ Feature: FUN-10 Entorno colaborativo en mod_sqlab
   #     de la interfaz definitiva del plugin.
   #   - Si el botón de invitar tiene un texto o icono diferente, adaptar el paso
   #     I press "Invitar" al selector correcto.
-  #   - Los escenarios de awareness (CU-12) verifican la presencia del indicador; 
+  #   - Los escenarios de awareness (CU-11) verifican la presencia del indicador; 
   #     para validar valores concretos (número de participantes), el tutor deberá
   #     abrir una segunda sesión simultánea o adaptar el escenario.
 
@@ -51,7 +51,7 @@ Feature: FUN-10 Entorno colaborativo en mod_sqlab
       | activity | course | name              | intro                      | section |
       | sqlab    | BBDD   | Consultas básicas | Practica tus consultas SQL | 1       |
 
-  # CU-10a — El indicador de awareness (sala colaborativa) es visible en la actividad
+  # CU-09a — El indicador de awareness (sala colaborativa) es visible en la actividad
   Scenario: El estudiante ve el indicador de sala colaborativa al acceder a la actividad
     Given I log in as "student1"
     And I am on "BBDD" course homepage
@@ -60,7 +60,7 @@ Feature: FUN-10 Entorno colaborativo en mod_sqlab
     And I should not see "Fatal error"
     And I should not see "Warning:"
 
-  # CU-10b — La interfaz muestra el botón para unirse a una sala colaborativa
+  # CU-09b — La interfaz muestra el botón para unirse a una sala colaborativa
   Scenario: El estudiante ve el botón para unirse a una sala colaborativa
     Given I log in as "student1"
     And I am on "BBDD" course homepage
@@ -68,7 +68,7 @@ Feature: FUN-10 Entorno colaborativo en mod_sqlab
     Then I should see "Unirme a la sala"
     And I should not see "Fatal error"
 
-  # CU-11 — El estudiante puede unirse a una sala introduciendo su ID
+  # CU-10 — El estudiante puede unirse a una sala introduciendo su ID
   Scenario: El estudiante puede acceder al formulario de unión a sala mediante ID
     Given I log in as "student1"
     And I am on "BBDD" course homepage
@@ -78,7 +78,7 @@ Feature: FUN-10 Entorno colaborativo en mod_sqlab
     And I should not see "Warning:"
     And I should not see "Notice:"
 
-  # CU-12a — El awareness muestra el número de participantes conectados
+  # CU-11a — El awareness muestra el número de participantes conectados
   Scenario: El indicador de participantes conectados es visible en la actividad
     Given I log in as "student1"
     And I am on "BBDD" course homepage
@@ -86,7 +86,7 @@ Feature: FUN-10 Entorno colaborativo en mod_sqlab
     Then I should see "Participantes"
     And I should not see "Fatal error"
 
-  # CU-12b — Al pulsar sobre el nº de participantes se muestra la lista de usuarios conectados
+  # CU-11b — Al pulsar sobre el nº de participantes se muestra la lista de usuarios conectados
   Scenario: El estudiante puede ver la lista de usuarios conectados en la sala
     Given I log in as "student1"
     And I am on "BBDD" course homepage
@@ -95,7 +95,7 @@ Feature: FUN-10 Entorno colaborativo en mod_sqlab
     Then I should not see "Fatal error"
     And I should not see "Warning:"
 
-  # CU-12c — Al pulsar sobre el ID de sala, la URL se copia al portapapeles (sin error PHP)
+  # CU-11c — Al pulsar sobre el ID de sala, la URL se copia al portapapeles (sin error PHP)
   # NOTA: No es posible verificar el portapapeles desde Behat/Selenium.
   # Este escenario verifica que la acción no genera errores PHP visibles.
   Scenario: Pulsar en el ID de sala no genera errores PHP

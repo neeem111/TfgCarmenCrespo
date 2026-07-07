@@ -1,7 +1,7 @@
 @mod @mod_sqlab @javascript
 Feature: FUN-09 Estudiante accede al menú de diccionario de datos en mod_sqlab
   # Cubre:
-  # CU-09 — Estudiante: Consultar el diccionario de datos mediante el menú jerárquico de snippets
+  # CU-08 — Estudiante: Consultar el diccionario de datos mediante el menú jerárquico de snippets
   #
   # DESCRIPCIÓN DE LA FUNCIONALIDAD:
   #   El plugin incluye un menú jerárquico con snippets de código para consultar el
@@ -36,7 +36,7 @@ Feature: FUN-09 Estudiante accede al menú de diccionario de datos en mod_sqlab
       | activity | course | name              | intro                      | section |
       | sqlab    | BBDD   | Consultas básicas | Practica tus consultas SQL | 1       |
 
-  # CU-09a — El menú de diccionario de datos está visible en la actividad
+  # CU-08a — El menú de diccionario de datos está visible en la actividad
   Scenario: El estudiante ve el menú de diccionario de datos al acceder a la actividad
     Given I log in as "student1"
     And I am on "BBDD" course homepage
@@ -45,7 +45,7 @@ Feature: FUN-09 Estudiante accede al menú de diccionario de datos en mod_sqlab
     And I should not see "Fatal error"
     And I should not see "Warning:"
 
-  # CU-09b — El menú jerárquico se despliega sin errores al interactuar con él
+  # CU-08b — El menú jerárquico se despliega sin errores al interactuar con él
   Scenario: El estudiante puede desplegar el menú jerárquico del diccionario sin errores
     Given I log in as "student1"
     And I am on "BBDD" course homepage
@@ -55,7 +55,7 @@ Feature: FUN-09 Estudiante accede al menú de diccionario de datos en mod_sqlab
     And I should not see "Warning:"
     And I should not see "Notice:"
 
-  # CU-09c — Al seleccionar un snippet del diccionario, el código se inserta en el editor SQL
+  # CU-08c — Al seleccionar un snippet del diccionario, el código se inserta en el editor SQL
   Scenario: El código del snippet seleccionado del diccionario se inserta en el editor SQL
     Given I log in as "student1"
     And I am on "BBDD" course homepage

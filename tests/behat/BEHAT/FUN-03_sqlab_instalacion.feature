@@ -4,6 +4,10 @@ Feature: FUN-03 El plugin mod_sqlab está correctamente instalado en Moodle
   # Requisito: Instalación correcta desde paquete ZIP
   # Requisito: Funcionamiento sin errores PHP con depuración activada
   #
+  # EXCLUIDO DEL ALCANCE EJECUTADO: estos escenarios requieren una cuenta de
+  #   administrador (panel de administración del sitio), no disponible en este
+  #   trabajo. La instalación se verifica mediante PHPUnit (UNI-02a).
+  #
   # Sin @javascript: la página de administración de módulos no requiere JS.
   #
   # NOTA PARA EL TUTOR:
