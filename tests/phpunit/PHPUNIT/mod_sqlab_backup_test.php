@@ -15,33 +15,33 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * UNI-04 — Backup and Restore API de mod_sqlab.
+ * uni-04 — aquí pruebo la backup and restore API de mod_sqlab.
  *
- * ATENCIÓN — APPROVAL BLOCKER:
- *   La Backup & Restore API es OBLIGATORIA para módulos de actividad.
- *   Su ausencia impide automáticamente la publicación en el directorio
- *   oficial de Moodle, independientemente de la calidad del resto del código.
+ * ojo — approval blocker:
+ *   la backup & restore API es OBLIGATORIA en cualquier módulo de actividad.
+ *   si falta, automáticamente no se puede publicar en el directorio oficial de moodle,
+ *   da igual lo bien hecho que esté el resto del plugin.
  *
- * Suite con tests de existencia y de comportamiento:
+ * suite con tests de existencia y de comportamiento:
  *
- *   UNI-04a [E] Directorio backup/moodle2/ existe
- *   UNI-04b [E] Fichero backup_sqlab_activity_task.class.php existe
- *   UNI-04c [E] Fichero restore_sqlab_activity_task.class.php existe
- *   UNI-04d [C] Clase de backup hereda de backup_activity_task
- *   UNI-04e [C] Clase de restauración hereda de restore_activity_task
+ *   uni-04a [e] existe el directorio backup/moodle2/
+ *   uni-04b [e] existe el fichero backup_sqlab_activity_task.class.php
+ *   uni-04c [e] existe el fichero restore_sqlab_activity_task.class.php
+ *   uni-04d [c] la clase de backup hereda de backup_activity_task
+ *   uni-04e [c] la clase de restauración hereda de restore_activity_task
  *
- * UNI-04d y UNI-04e son tests de comportamiento nuevos. La versión anterior
- * solo comprobaba existencia de ficheros sin verificar que la implementación
- * fuera correcta (herencia de clases base de Moodle).
+ * uni-04d y uni-04e son tests de comportamiento que añadí yo. antes la suite
+ * solo miraba si existían los ficheros, sin comprobar que la implementación
+ * fuera correcta (que heredara bien de las clases base de moodle).
  *
- * RESULTADO ESPERADO CON LA VERSION ACTUAL DEL PLUGIN:
- *   UNI-04a FAILED — directorio no existe (approval blocker)
- *   UNI-04b FAILED — fichero no existe (approval blocker)
- *   UNI-04c FAILED — fichero no existe (approval blocker)
- *   UNI-04d SKIPPED — no se puede verificar sin el fichero
- *   UNI-04e SKIPPED — no se puede verificar sin el fichero
+ * resultado que me da con la versión actual del plugin:
+ *   uni-04a FAILED — no existe el directorio (approval blocker)
+ *   uni-04b FAILED — no existe el fichero (approval blocker)
+ *   uni-04c FAILED — no existe el fichero (approval blocker)
+ *   uni-04d SKIPPED — no se puede comprobar sin el fichero
+ *   uni-04e SKIPPED — no se puede comprobar sin el fichero
  *
- * === CÓMO EJECUTAR ===
+ * === cómo lo ejecuto ===
  *   vendor/bin/phpunit mod/sqlab/tests/mod_sqlab_backup_test.php --testdox
  *
  * @package    mod_sqlab
@@ -53,21 +53,21 @@
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * Tests de la Backup and Restore API de mod_sqlab.
+ * tests de la backup and restore API de mod_sqlab.
  *
  * @group mod_sqlab
  */
 class mod_sqlab_backup_test extends advanced_testcase {
 
     // =========================================================================
-    // [E] Tests de existencia — APPROVAL BLOCKERS
+    // [E] tests de existencia — approval blockers
     // =========================================================================
 
     /**
-     * UNI-04a [E] — APPROVAL BLOCKER: El directorio backup/moodle2/ debe existir.
+     * uni-04a [e] — approval blocker: tiene que existir el directorio backup/moodle2/.
      *
-     * Si falla: el plugin NO puede ser publicado en el directorio oficial de Moodle.
-     * Acción requerida: crear el directorio y los ficheros de implementación.
+     * si esto falla, el plugin NO se puede publicar en el directorio oficial de moodle.
+     * lo que hay que hacer: crear el directorio y los ficheros de implementación.
      */
     public function test_backup_directory_exists(): void {
         global $CFG;
@@ -86,7 +86,7 @@ class mod_sqlab_backup_test extends advanced_testcase {
     }
 
     /**
-     * UNI-04b [E] — APPROVAL BLOCKER: El fichero de tarea de backup debe existir.
+     * uni-04b [e] — approval blocker: tiene que existir el fichero de la tarea de backup.
      */
     public function test_backup_task_file_exists(): void {
         global $CFG;
@@ -104,7 +104,7 @@ class mod_sqlab_backup_test extends advanced_testcase {
     }
 
     /**
-     * UNI-04c [E] — APPROVAL BLOCKER: El fichero de tarea de restauración debe existir.
+     * uni-04c [e] — approval blocker: tiene que existir el fichero de la tarea de restauración.
      */
     public function test_restore_task_file_exists(): void {
         global $CFG;
@@ -122,23 +122,23 @@ class mod_sqlab_backup_test extends advanced_testcase {
     }
 
     // =========================================================================
-    // [C] Tests de comportamiento — herencia correcta de clases base
+    // [C] tests de comportamiento — que la herencia esté bien hecha
     // =========================================================================
 
     /**
-     * UNI-04d [C] — COMPORTAMIENTO: La clase de backup hereda de backup_activity_task.
+     * uni-04d [c] — comportamiento: la clase de backup tiene que heredar de backup_activity_task.
      *
-     * DIFERENCIA CON LA VERSION ANTERIOR:
-     *   La suite anterior solo comprobaba que el fichero existía.
-     *   Este test verifica que la implementación es correcta:
-     *     1. La clase backup_sqlab_activity_task está definida en el fichero.
-     *     2. Extiende backup_activity_task (integración con el sistema de Moodle).
-     *     3. Implementa el método obligatorio define_my_steps().
+     * diferencia con la versión anterior:
+     *   antes solo se comprobaba que el fichero existiera.
+     *   aquí compruebo que la implementación está bien hecha de verdad:
+     *     1. la clase backup_sqlab_activity_task está definida en el fichero.
+     *     2. extiende backup_activity_task (para integrarse con el sistema de moodle).
+     *     3. implementa el método obligatorio define_my_steps().
      *
-     *   Un fichero que existe pero no hereda correctamente provocaría errores
-     *   en tiempo de ejecución cuando el usuario realice un backup del curso.
+     *   un fichero que existe pero hereda mal daría errores en tiempo de ejecución
+     *   en cuanto el usuario intentara hacer un backup del curso.
      *
-     * Si el fichero no existe (UNI-04b FAILED), este test se marca SKIPPED.
+     * si el fichero no existe (uni-04b FAILED), este test se marca SKIPPED.
      */
     public function test_backup_task_extends_base_class(): void {
         global $CFG;
@@ -150,25 +150,25 @@ class mod_sqlab_backup_test extends advanced_testcase {
             );
         }
 
-        // Cargar la clase base de Moodle y la implementación del plugin.
+        // arrange: cargo la clase base de moodle y la implementación del plugin.
         require_once($CFG->dirroot . '/backup/moodle2/backup_activity_task.class.php');
         require_once($file);
 
-        // Verificar que la clase está definida en el fichero.
+        // assert 1: que la clase esté definida con el nombre exacto que espera moodle.
         $this->assertTrue(
             class_exists('backup_sqlab_activity_task'),
             'El fichero backup_sqlab_activity_task.class.php no define la clase esperada. ' .
             'La clase debe llamarse exactamente "backup_sqlab_activity_task".'
         );
 
-        // Verificar herencia de la clase base de Moodle.
+        // assert 2: que herede de la clase base de moodle (esto es lo importante).
         $this->assertTrue(
             is_subclass_of('backup_sqlab_activity_task', 'backup_activity_task'),
             'FALLO DE COMPORTAMIENTO: backup_sqlab_activity_task NO hereda de backup_activity_task. ' .
             'Sin esta herencia, Moodle no puede integrar la actividad en su sistema de backup.'
         );
 
-        // Verificar que implementa el método obligatorio.
+        // assert 3: que tenga el método obligatorio implementado.
         $this->assertTrue(
             method_exists('backup_sqlab_activity_task', 'define_my_steps'),
             'backup_sqlab_activity_task no implementa define_my_steps(). ' .
@@ -177,13 +177,13 @@ class mod_sqlab_backup_test extends advanced_testcase {
     }
 
     /**
-     * UNI-04e [C] — COMPORTAMIENTO: La clase de restauración hereda de restore_activity_task.
+     * uni-04e [c] — comportamiento: la clase de restauración tiene que heredar de restore_activity_task.
      *
-     * DIFERENCIA CON LA VERSION ANTERIOR:
-     *   No existía en la suite anterior. Verifica herencia correcta de la clase
-     *   de restauración, análogamente a UNI-04d para el backup.
+     * diferencia con la versión anterior:
+     *   este test no existía antes. hace lo mismo que uni-04d pero para restauración,
+     *   comprobando la herencia correcta.
      *
-     * Si el fichero no existe (UNI-04c FAILED), este test se marca SKIPPED.
+     * si el fichero no existe (uni-04c FAILED), este test se marca SKIPPED.
      */
     public function test_restore_task_extends_base_class(): void {
         global $CFG;
@@ -195,14 +195,17 @@ class mod_sqlab_backup_test extends advanced_testcase {
             );
         }
 
+        // arrange: cargo la clase base y la del plugin.
         require_once($CFG->dirroot . '/backup/moodle2/restore_activity_task.class.php');
         require_once($file);
 
+        // assert: la clase existe con el nombre esperado.
         $this->assertTrue(
             class_exists('restore_sqlab_activity_task'),
             'El fichero no define la clase "restore_sqlab_activity_task".'
         );
 
+        // assert: y hereda de la clase base de moodle.
         $this->assertTrue(
             is_subclass_of('restore_sqlab_activity_task', 'restore_activity_task'),
             'FALLO DE COMPORTAMIENTO: restore_sqlab_activity_task NO hereda de restore_activity_task. ' .

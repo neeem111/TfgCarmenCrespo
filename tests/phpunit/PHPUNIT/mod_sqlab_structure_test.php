@@ -15,15 +15,15 @@
 // along with Moodle. If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * UNI-05 - Verifica la estructura de archivos obligatorios de mod_sqlab.
+ * uni-05 - aquí compruebo que mod_sqlab tiene la estructura de ficheros obligatoria en moodle.
  *
- * Cubre los siguientes requisitos obligatorios de Moodle:
- * - UNI-05a: Estructura de BD (install.xml)
- * - UNI-05b: Gestión de actualizaciones (upgrade.php)
- * - UNI-05c: Paquete de idioma inglés (lang/en/)
- * - UNI-05d: lib.php con funciones add/update/delete_instance
- * - UNI-05e: Funciones de seguridad obligatorias (require_login, required_param, has_capability)
- * - UNI-05f: lang/en/sqlab.php sin sintaxis PHP compleja (heredoc, concatenación)
+ * cubro estos requisitos obligatorios:
+ * - uni-05a: estructura de BD (install.xml)
+ * - uni-05b: gestión de actualizaciones (upgrade.php)
+ * - uni-05c: paquete de idioma inglés (lang/en/)
+ * - uni-05d: lib.php con las funciones add/update/delete_instance
+ * - uni-05e: funciones de seguridad obligatorias (require_login, required_param, has_capability)
+ * - uni-05f: lang/en/sqlab.php sin sintaxis PHP rara (heredoc, concatenación)
  *
  * @package    mod_sqlab
  * @copyright  2024 Universidad de Castilla-La Mancha
@@ -36,8 +36,8 @@ defined('MOODLE_INTERNAL') || die();
 class mod_sqlab_structure_test extends advanced_testcase {
 
     /**
-     * UNI-05a — Existe db/install.xml (definición de la estructura de base de datos).
-     * Requisito: Definición de la estructura de BD mediante install.xml.
+     * uni-05a — miro si existe db/install.xml (define la estructura de la BD).
+     * requisito: la estructura de BD tiene que estar definida en install.xml.
      */
     public function test_install_xml_exists(): void {
         global $CFG;
@@ -48,8 +48,8 @@ class mod_sqlab_structure_test extends advanced_testcase {
     }
 
     /**
-     * UNI-05b — Existe db/upgrade.php (gestión de actualizaciones entre versiones).
-     * Requisito: Gestión de actualizaciones mediante upgrade.php.
+     * uni-05b — miro si existe db/upgrade.php (gestiona las actualizaciones entre versiones).
+     * requisito: las actualizaciones se gestionan mediante upgrade.php.
      */
     public function test_upgrade_php_exists(): void {
         global $CFG;
@@ -60,8 +60,8 @@ class mod_sqlab_structure_test extends advanced_testcase {
     }
 
     /**
-     * UNI-05c — Existe el fichero de idioma inglés (lang/en/sqlab.php).
-     * Requisito: El plugin debe incluir únicamente el paquete de idioma inglés.
+     * uni-05c — miro si existe el fichero de idioma inglés (lang/en/sqlab.php).
+     * requisito: el plugin solo debe incluir el paquete de idioma inglés.
      */
     public function test_lang_en_exists(): void {
         global $CFG;
@@ -72,8 +72,8 @@ class mod_sqlab_structure_test extends advanced_testcase {
     }
 
     /**
-     * UNI-05d — lib.php existe y contiene las tres funciones obligatorias de módulo de actividad.
-     * Requisito: Archivos obligatorios con funciones add/update/delete_instance.
+     * uni-05d — lib.php existe y tiene las tres funciones obligatorias de todo módulo de actividad.
+     * requisito: los ficheros obligatorios deben tener las funciones add/update/delete_instance.
      */
     public function test_lib_php_has_required_functions(): void {
         global $CFG;
@@ -90,17 +90,17 @@ class mod_sqlab_structure_test extends advanced_testcase {
     }
 
     /**
-     * UNI-05e — Los ficheros PHP del plugin usan las funciones de seguridad obligatorias de Moodle.
-     * Verifica la presencia de require_login(), required_param() y has_capability()
-     * en el conjunto de ficheros PHP del plugin (excluyendo el directorio tests/).
+     * uni-05e — compruebo que los ficheros PHP del plugin usan las funciones de seguridad
+     * obligatorias de moodle: require_login(), required_param() y has_capability(),
+     * mirando en todo el código fuente del plugin (menos el directorio tests/).
      *
-     * Requisito (approval blocker): Incumplimiento de normas de seguridad.
-     * Referencia: Sección 3.2.1 Requisitos de seguridad.
+     * requisito (approval blocker): incumplir las normas de seguridad tumba la aprobación.
+     * referencia: sección 3.2.1 requisitos de seguridad.
      *
-     * Nota metodológica: Este test verifica presencia mínima en el código fuente completo
-     * del plugin. Un resultado PASSED confirma que al menos se utilizan; un resultado FAILED
-     * indica ausencia total, que es un indicador de incumplimiento grave.
-     * La auditoría detallada de uso correcto en cada punto de entrada la realiza phpcs (EST-01).
+     * nota mía: este test solo comprueba presencia mínima en el código fuente completo.
+     * un PASSED confirma que al menos se usan en algún sitio; un FAILED indica ausencia
+     * total, que ya es grave. la auditoría fina de si el uso es correcto en cada punto
+     * de entrada la hace phpcs (EST-01), aquí no entro en ese detalle.
      */
     public function test_security_functions_present(): void {
         global $CFG;
@@ -113,6 +113,7 @@ class mod_sqlab_structure_test extends advanced_testcase {
             )
         );
 
+        // arrange: concateno el contenido de todos los ficheros PHP del plugin, sin tests/.
         $allcontent = '';
         foreach ($phpfiles as $file) {
             if ($file->getExtension() === 'php'
@@ -121,6 +122,7 @@ class mod_sqlab_structure_test extends advanced_testcase {
             }
         }
 
+        // assert: las tres funciones de seguridad tienen que aparecer en algún sitio.
         $this->assertStringContainsString('require_login',
             $allcontent,
             'Ningún fichero PHP del plugin usa require_login() — approval blocker de seguridad');
@@ -133,12 +135,12 @@ class mod_sqlab_structure_test extends advanced_testcase {
     }
 
     /**
-     * UNI-05f — lang/en/sqlab.php no contiene sintaxis PHP compleja prohibida por Moodle.
-     * Verifica que el archivo de idioma no usa heredoc/nowdoc ni concatenaciones en las
-     * asignaciones de cadenas, tal como exige el estándar de calidad de Moodle.
+     * uni-05f — compruebo que lang/en/sqlab.php no usa sintaxis PHP compleja, que está
+     * prohibida por moodle en los ficheros de idioma: nada de heredoc/nowdoc ni
+     * concatenaciones en las asignaciones de cadenas.
      *
-     * Requisito: El archivo de idioma debe contener exclusivamente asignaciones simples.
-     * Referencia: Sección 3.2.1 Sistemas de cadenas de texto.
+     * requisito: el archivo de idioma solo puede tener asignaciones simples.
+     * referencia: sección 3.2.1 sistemas de cadenas de texto.
      */
     public function test_lang_file_has_no_complex_syntax(): void {
         global $CFG;
@@ -148,16 +150,16 @@ class mod_sqlab_structure_test extends advanced_testcase {
 
         $content = file_get_contents($langfile);
 
-        // Verificar ausencia de heredoc y nowdoc (<<< operador)
+        // compruebo que no hay heredoc ni nowdoc (el operador <<<).
         $this->assertStringNotContainsString('<<<',
             $content,
             'lang/en/sqlab.php contiene sintaxis heredoc o nowdoc, prohibida en archivos de idioma');
 
-        // Verificar ausencia de concatenación en asignaciones de $string[]
-        // Patrón detectado: $string['clave'] = 'algo' . 'otra'; o = "algo" . $var;
-        // NOTA: se usa [^\']* y [^\"]* para evitar falsos positivos causados por cadenas
-        // que contienen comillas internas (ej: $string['beforefinish'] que contiene "Evaluate Code". ).
-        // El operador de concatenación . solo puede aparecer FUERA de las comillas del valor.
+        // ahora compruebo que no hay concatenaciones en las asignaciones de $string[].
+        // patrón que busco: $string['clave'] = 'algo' . 'otra'; o = "algo" . $var;
+        // uso [^\']* y [^\"]* para no liarme con cadenas que llevan comillas dentro
+        // (ej: $string['beforefinish'] que contiene "Evaluate Code". ).
+        // el operador de concatenación . solo cuenta si aparece FUERA de las comillas del valor.
         $this->assertDoesNotMatchRegularExpression(
             '/\$string\s*\[[^\]]+\]\s*=\s*(?:\'[^\']*\'|"[^"]*")\s*\./m',
             $content,

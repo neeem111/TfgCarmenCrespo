@@ -15,20 +15,21 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * UNI-03 — Privacy API de mod_sqlab.
+ * uni-03 — aquí reviso la privacy API de mod_sqlab (la parte de RGPD).
  *
- * Suite con tests estructurales y de comportamiento:
+ * suite con tests estructurales y de comportamiento:
  *
- *   UNI-03a [E] Fichero classes/privacy/provider.php existe
- *   UNI-03b [E] Clase mod_sqlab\privacy\provider existe y se puede cargar
- *   UNI-03c [E] La clase implementa una interfaz de privacidad de Moodle
- *   UNI-03d [C] get_metadata() devuelve una Collection NO vacía
- *   UNI-03e [C] Las tablas declaradas en metadatos existen realmente en BD
+ *   uni-03a [e] existe el fichero classes/privacy/provider.php
+ *   uni-03b [e] existe la clase mod_sqlab\privacy\provider y se puede cargar
+ *   uni-03c [e] la clase implementa alguna interfaz de privacidad de moodle
+ *   uni-03d [c] get_metadata() devuelve una collection que NO está vacía
+ *   uni-03e [c] las tablas que declara en los metadatos existen de verdad en la BD
  *
- * UNI-03d y UNI-03e son tests de comportamiento nuevos. La versión anterior
- * solo comprobaba estructura (fichero, clase, interfaz) sin llamar nunca a la API.
+ * uni-03d y uni-03e son tests de comportamiento que añadí yo, no estaban en la
+ * versión anterior de la suite, que solo miraba estructura (fichero, clase, interfaz)
+ * sin llegar a llamar nunca a la API de verdad.
  *
- * === CÓMO EJECUTAR ===
+ * === cómo lo ejecuto ===
  *   vendor/bin/phpunit mod/sqlab/tests/mod_sqlab_privacy_test.php --testdox
  *
  * @package    mod_sqlab
@@ -40,21 +41,21 @@
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * Tests de la Privacy API de mod_sqlab.
+ * tests de la privacy API de mod_sqlab.
  *
  * @group mod_sqlab
  */
 class mod_sqlab_privacy_test extends advanced_testcase {
 
     // =========================================================================
-    // [E] Tests estructurales
+    // [E] tests estructurales
     // =========================================================================
 
     /**
-     * UNI-03a [E] — El fichero classes/privacy/provider.php existe.
+     * uni-03a [e] — miro si existe el fichero classes/privacy/provider.php.
      *
-     * La Privacy API es obligatoria cuando el plugin almacena datos personales.
-     * mod_sqlab almacena intentos e historial de consultas SQL de los estudiantes.
+     * la privacy API es obligatoria en cuanto el plugin guarda datos personales,
+     * y mod_sqlab guarda intentos e historial de consultas SQL de los alumnos, así que aplica.
      */
     public function test_privacy_provider_file_exists(): void {
         global $CFG;
@@ -66,7 +67,7 @@ class mod_sqlab_privacy_test extends advanced_testcase {
     }
 
     /**
-     * UNI-03b [E] — La clase mod_sqlab\privacy\provider existe y se puede cargar.
+     * uni-03b [e] — compruebo que la clase mod_sqlab\privacy\provider existe y carga bien.
      */
     public function test_privacy_provider_class_exists(): void {
         $this->assertTrue(
@@ -77,14 +78,15 @@ class mod_sqlab_privacy_test extends advanced_testcase {
     }
 
     /**
-     * UNI-03c [E] — La clase provider implementa al menos una interfaz de privacidad de Moodle.
+     * uni-03c [e] — compruebo que provider implementa al menos una interfaz de privacidad de moodle.
      *
-     * Las interfaces aceptadas son:
+     * las interfaces que acepto son:
      *   - core_privacy\local\metadata\provider       (almacena datos)
      *   - core_privacy\local\metadata\null_provider  (no almacena datos)
      *   - core_privacy\local\request\plugin\provider (gestiona solicitudes RGPD)
      */
     public function test_privacy_provider_implements_interface(): void {
+        // si no existe la clase, no tiene sentido seguir (eso ya lo cubre uni-03b).
         if (!class_exists('\mod_sqlab\privacy\provider')) {
             $this->markTestSkipped('Clase provider no existe — ver UNI-03b.');
         }
@@ -112,22 +114,22 @@ class mod_sqlab_privacy_test extends advanced_testcase {
     }
 
     // =========================================================================
-    // [C] Tests de comportamiento real
+    // [C] tests de comportamiento real
     // =========================================================================
 
     /**
-     * UNI-03d [C] — COMPORTAMIENTO: get_metadata() devuelve una Collection no vacía.
+     * uni-03d [c] — comportamiento: get_metadata() tiene que devolver una collection no vacía.
      *
-     * DIFERENCIA CON LA VERSION ANTERIOR:
-     *   La suite anterior solo comprobaba que la clase y la interfaz existían.
-     *   Este test LLAMA REALMENTE a get_metadata() y verifica que:
-     *     1. Devuelve una instancia de Collection (no null, no bool, no array).
-     *     2. La colección contiene al menos un elemento.
+     * diferencia con la versión anterior:
+     *   antes solo se comprobaba que existieran la clase y la interfaz.
+     *   aquí LLAMO DE VERDAD a get_metadata() y compruebo que:
+     *     1. devuelve una instancia de collection (no null, no bool, no array).
+     *     2. la colección tiene al menos un elemento dentro.
      *
-     *   Una colección vacía indicaría que el plugin no declara qué datos almacena,
-     *   lo que incumpliría el RGPD aunque técnicamente implemente la interfaz.
+     *   si la colección viniera vacía, significaría que el plugin no declara qué datos
+     *   guarda, y eso incumple el RGPD aunque técnicamente implemente la interfaz.
      *
-     * Requisito verificado: Obligatorio — Privacy API con declaración de datos (RGPD).
+     * requisito verificado: obligatorio — privacy API con declaración de datos (RGPD).
      */
     public function test_privacy_get_metadata_returns_populated_collection(): void {
         if (!class_exists('\mod_sqlab\privacy\provider')) {
@@ -138,11 +140,11 @@ class mod_sqlab_privacy_test extends advanced_testcase {
             $this->markTestSkipped('API de privacidad de Moodle no disponible en este entorno.');
         }
 
-        // Llamar realmente a la API de privacidad.
+        // act: llamo de verdad a la API de privacidad, no me quedo solo en comprobar que existe.
         $collection = new \core_privacy\local\metadata\collection('mod_sqlab');
         $result     = \mod_sqlab\privacy\provider::get_metadata($collection);
 
-        // Verificar tipo de retorno.
+        // assert: primero el tipo de retorno.
         $this->assertInstanceOf(
             \core_privacy\local\metadata\collection::class,
             $result,
@@ -150,7 +152,7 @@ class mod_sqlab_privacy_test extends advanced_testcase {
             'Tipo recibido: ' . gettype($result)
         );
 
-        // Verificar que la colección no está vacía.
+        // assert: y que dentro haya contenido, no una colección vacía.
         $items = $result->get_collection();
         $this->assertNotEmpty(
             $items,
@@ -161,15 +163,15 @@ class mod_sqlab_privacy_test extends advanced_testcase {
     }
 
     /**
-     * UNI-03e [C] — COMPORTAMIENTO: las tablas declaradas en metadatos existen en la BD.
+     * uni-03e [c] — comportamiento: las tablas que declara en metadatos existen en la BD.
      *
-     * DIFERENCIA CON LA VERSION ANTERIOR:
-     *   No existía en la suite anterior. Este test cruza la declaración de Privacy API
-     *   con el esquema real de la BD, detectando inconsistencias del tipo:
-     *     - Se declara 'sqlab_attempts' pero la tabla se llama 'sqlab_attempt'.
-     *     - Se declara una tabla que nunca se creó.
+     * diferencia con la versión anterior:
+     *   este test no existía antes. lo que hago es cruzar lo que declara la privacy API
+     *   con el esquema real de la BD, para pillar cosas tipo:
+     *     - declara 'sqlab_attempts' pero la tabla en realidad se llama 'sqlab_attempt'.
+     *     - declara una tabla que nunca llegó a crearse.
      *
-     * Requisito verificado: Coherencia entre Privacy API y estructura de BD.
+     * requisito verificado: coherencia entre privacy API y estructura de BD.
      */
     public function test_privacy_declared_tables_exist_in_db(): void {
         global $DB;
@@ -182,6 +184,7 @@ class mod_sqlab_privacy_test extends advanced_testcase {
             $this->markTestSkipped('API de privacidad de Moodle no disponible en este entorno.');
         }
 
+        // arrange: recupero la misma colección que uso en uni-03d.
         $collection = new \core_privacy\local\metadata\collection('mod_sqlab');
         $result     = \mod_sqlab\privacy\provider::get_metadata($collection);
         $items      = $result->get_collection();
@@ -193,8 +196,8 @@ class mod_sqlab_privacy_test extends advanced_testcase {
         $dbmanager    = $DB->get_manager();
         $missingtables = [];
 
+        // recorro solo los elementos que declaran tablas de BD (hay otros tipos de metadato).
         foreach ($items as $item) {
-            // Comprobar solo los elementos que declaran tablas de la BD.
             if ($item instanceof \core_privacy\local\metadata\types\database_table) {
                 $tablename = $item->get_name();
                 if (!$dbmanager->table_exists($tablename)) {
@@ -203,6 +206,7 @@ class mod_sqlab_privacy_test extends advanced_testcase {
             }
         }
 
+        // assert: si hay alguna tabla declarada que no existe en BD, es una inconsistencia.
         $this->assertEmpty(
             $missingtables,
             'INCONSISTENCIA: las siguientes tablas están declaradas en la Privacy API ' .

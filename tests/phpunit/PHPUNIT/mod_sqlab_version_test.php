@@ -15,26 +15,26 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * UNI-02 — Instalación, metadatos y comportamiento de las funciones de ciclo de vida.
+ * uni-02 — aquí pruebo la instalación, los metadatos y que las funciones de ciclo de vida
+ * (add/update/delete instance) hagan de verdad lo que tienen que hacer.
  *
- * Suite con dos tipos de tests:
- *   [E] Tests estructurales: comprueban que el plugin está instalado correctamente.
- *   [C] Tests de comportamiento: comprueban que las funciones de lib.php HACEN lo
- *       que deben hacer, no solo que existen. Esta es la diferencia clave respecto
- *       a la versión anterior de la suite.
+ * tengo dos tipos de test en esta suite:
+ *   [e] estructurales: solo comprueban que el plugin está instalado y que existen las cosas.
+ *   [c] de comportamiento: comprueban que las funciones de lib.php HACEN lo que deben,
+ *       no solo que existen. esto es justo lo que le faltaba a la versión anterior de la suite.
  *
- *   UNI-02a [E] Plugin registrado en Moodle
- *   UNI-02b [E] version.php con campos y formato válidos
- *   UNI-02c [E] Tabla mdl_sqlab existe en BD
- *   UNI-02d [C] sqlab_delete_instance() BORRA el registro de mdl_sqlab
- *   UNI-02e [C] sqlab_update_instance() MODIFICA el registro en mdl_sqlab
- *   UNI-02f [SKIPPED] sqlab_add_instance() — dependencia qtype_sqlquestion
- *   UNI-02g [C] set_config()/get_config() almacenan en config_plugins
+ *   uni-02a [e] el plugin está registrado en moodle
+ *   uni-02b [e] version.php tiene los campos con el formato correcto
+ *   uni-02c [e] la tabla mdl_sqlab existe en BD
+ *   uni-02d [c] sqlab_delete_instance() borra de verdad el registro de mdl_sqlab
+ *   uni-02e [c] sqlab_update_instance() modifica de verdad el registro en mdl_sqlab
+ *   uni-02f [skipped] sqlab_add_instance() — no lo puedo probar, depende de qtype_sqlquestion
+ *   uni-02g [c] set_config()/get_config() guardan bien en config_plugins
  *
- * === CÓMO EJECUTAR ===
- *   SIEMPRE por fichero individual. Nunca con --group mod_sqlab.
- *   El flag --group carga todos los suites de Moodle y provoca un fatal error
- *   en qtype_sqlquestion\privacy\provider (bug externo, no de mod_sqlab).
+ * === cómo lo ejecuto ===
+ *   siempre fichero a fichero. NUNCA con --group mod_sqlab.
+ *   si uso --group carga todas las suites de moodle y me peta con un fatal error
+ *   en qtype_sqlquestion\privacy\provider (eso es un bug externo, no mío).
  *
  *   vendor/bin/phpunit mod/sqlab/tests/mod_sqlab_version_test.php --testdox
  *
@@ -46,21 +46,21 @@
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * Tests de instalación, metadatos y ciclo de vida de mod_sqlab.
+ * tests de instalación, metadatos y ciclo de vida de mod_sqlab.
  *
  * @group mod_sqlab
  */
 class mod_sqlab_version_test extends advanced_testcase {
 
     // =========================================================================
-    // [E] Tests estructurales
+    // [E] tests estructurales
     // =========================================================================
 
     /**
-     * UNI-02a [E] — El plugin mod_sqlab está registrado en Moodle.
+     * uni-02a [e] — compruebo que mod_sqlab está registrado en moodle.
      *
-     * Un PASSED confirma que la instalación desde ZIP fue correcta y que
-     * plugin_manager reconoce el componente mod_sqlab.
+     * si esto pasa, quiere decir que la instalación desde el ZIP fue bien
+     * y que plugin_manager reconoce el componente mod_sqlab.
      */
     public function test_plugin_is_installed(): void {
         $plugininfo = core_plugin_manager::instance()->get_plugin_info('mod_sqlab');
@@ -72,12 +72,12 @@ class mod_sqlab_version_test extends advanced_testcase {
     }
 
     /**
-     * UNI-02b [E] — version.php define los campos obligatorios con valores válidos.
+     * uni-02b [e] — reviso que version.php define los campos obligatorios y con el formato bien.
      *
-     * Verifica no solo presencia sino formato correcto:
+     * no me vale solo con que existan, compruebo también el formato:
      *   - $plugin->version  : entero YYYYMMDDNN (10 dígitos)
-     *   - $plugin->requires : entero (versión mínima de Moodle)
-     *   - $plugin->component: exactamente 'mod_sqlab' (Frankenstyle obligatorio)
+     *   - $plugin->requires : entero (versión mínima de moodle)
+     *   - $plugin->component: tiene que ser exactamente 'mod_sqlab' (frankenstyle obligatorio)
      */
     public function test_version_file_has_required_fields(): void {
         global $CFG;
@@ -85,6 +85,7 @@ class mod_sqlab_version_test extends advanced_testcase {
         $versionfile = $CFG->dirroot . '/mod/sqlab/version.php';
         $this->assertFileExists($versionfile, 'El fichero version.php no existe en mod/sqlab/');
 
+        // cargo el fichero real del plugin, no un mock.
         $plugin = new stdClass();
         include($versionfile);
 
@@ -100,7 +101,7 @@ class mod_sqlab_version_test extends advanced_testcase {
         // requires: versión mínima de Moodle requerida.
         $this->assertNotEmpty($plugin->requires, 'version.php no define $plugin->requires');
 
-        // component: Frankenstyle — approval blocker si es incorrecto.
+        // component: frankenstyle — si esto está mal es approval blocker seguro.
         $this->assertEquals(
             'mod_sqlab',
             $plugin->component,
@@ -111,9 +112,9 @@ class mod_sqlab_version_test extends advanced_testcase {
     }
 
     /**
-     * UNI-02c [E] — La tabla mdl_sqlab existe en la base de datos.
+     * uni-02c [e] — compruebo que la tabla mdl_sqlab existe en la BD.
      *
-     * Verifica que db/install.xml se aplicó correctamente durante la instalación.
+     * esto confirma que db/install.xml se aplicó bien durante la instalación.
      */
     public function test_database_table_exists(): void {
         global $DB;
@@ -125,22 +126,22 @@ class mod_sqlab_version_test extends advanced_testcase {
     }
 
     // =========================================================================
-    // [C] Tests de comportamiento real
+    // [C] tests de comportamiento real
     // =========================================================================
 
     /**
-     * UNI-02d [C] — COMPORTAMIENTO: sqlab_delete_instance() elimina el registro de la BD.
+     * uni-02d [c] — comportamiento: sqlab_delete_instance() tiene que borrar el registro de la BD.
      *
-     * DIFERENCIA CON LA VERSION ANTERIOR:
-     *   La suite anterior solo comprobaba que la función estaba declarada en lib.php.
-     *   Este test verifica que la función REALMENTE BORRA el registro de mdl_sqlab.
+     * diferencia con la versión anterior de la suite:
+     *   antes solo miraba que la función estuviera declarada en lib.php.
+     *   aquí compruebo que la función REALMENTE BORRA el registro de mdl_sqlab.
      *
-     * Estrategia para evitar la dependencia con qtype_sqlquestion:
-     *   En lugar de llamar a sqlab_add_instance() (que requiere quiz->id y qtype_sqlquestion),
-     *   se inserta el registro directamente en mdl_sqlab usando $DB->insert_record().
-     *   Esto prueba sqlab_delete_instance() de forma aislada, como una verdadera prueba unitaria.
+     * truco para no depender de qtype_sqlquestion:
+     *   en vez de llamar a sqlab_add_instance() (que necesita quiz->id y qtype_sqlquestion),
+     *   inserto el registro directamente en mdl_sqlab con $DB->insert_record().
+     *   así pruebo sqlab_delete_instance() aislada, como debería ser una prueba unitaria de verdad.
      *
-     * Requisito verificado: Obligatorio — lib.php debe contener sqlab_delete_instance().
+     * requisito verificado: obligatorio — lib.php debe contener sqlab_delete_instance().
      */
     public function test_sqlab_delete_instance_removes_db_record(): void {
         global $DB, $CFG;
@@ -156,7 +157,7 @@ class mod_sqlab_version_test extends advanced_testcase {
             'sqlab_delete_instance() no existe en lib.php — ver UNI-05d.'
         );
 
-        // Paso 1: insertar registro directamente (sin pasar por add_instance).
+        // arrange: inserto el registro directamente, sin pasar por add_instance.
         $course = $this->getDataGenerator()->create_course();
         $record = $this->build_minimal_sqlab_record($course->id);
 
@@ -174,7 +175,7 @@ class mod_sqlab_version_test extends advanced_testcase {
         $this->assertTrue($DB->record_exists('sqlab', ['id' => $id]),
             'El registro no existe en BD tras el insert — error de entorno.');
 
-        // Paso 2: llamar a la función bajo test.
+        // act: llamo a la función que quiero probar.
         try {
             $result = sqlab_delete_instance($id);
         } catch (\Throwable $e) {
@@ -184,7 +185,7 @@ class mod_sqlab_version_test extends advanced_testcase {
             );
         }
 
-        // Paso 3: verificar comportamiento.
+        // assert: compruebo que de verdad ha borrado el registro, no solo que devuelve true.
         $this->assertTrue(
             (bool)$result,
             'sqlab_delete_instance() devolvió: ' . var_export($result, true) . '. Debe devolver true.'
@@ -197,13 +198,13 @@ class mod_sqlab_version_test extends advanced_testcase {
     }
 
     /**
-     * UNI-02e [C] — COMPORTAMIENTO: sqlab_update_instance() modifica el registro en la BD.
+     * uni-02e [c] — comportamiento: sqlab_update_instance() tiene que modificar el registro en la BD.
      *
-     * DIFERENCIA CON LA VERSION ANTERIOR:
-     *   No existía en la suite anterior. Este test verifica que sqlab_update_instance()
-     *   efectivamente persiste los cambios en mdl_sqlab.
+     * diferencia con la versión anterior:
+     *   este test no existía antes. aquí compruebo que sqlab_update_instance()
+     *   persiste de verdad los cambios en mdl_sqlab, no que simplemente exista la función.
      *
-     * Requisito verificado: Obligatorio — lib.php debe contener sqlab_update_instance().
+     * requisito verificado: obligatorio — lib.php debe contener sqlab_update_instance().
      */
     public function test_sqlab_update_instance_modifies_db_record(): void {
         global $DB, $CFG;
@@ -219,7 +220,7 @@ class mod_sqlab_version_test extends advanced_testcase {
             'sqlab_update_instance() no existe en lib.php — ver UNI-05d.'
         );
 
-        // Paso 1: insertar registro con nombre inicial.
+        // arrange: inserto un registro con un nombre inicial para poder comprobar el cambio después.
         $course = $this->getDataGenerator()->create_course();
         $record = $this->build_minimal_sqlab_record($course->id);
         $record->name = 'Nombre original antes de update';
@@ -231,14 +232,14 @@ class mod_sqlab_version_test extends advanced_testcase {
             return;
         }
 
-        // Paso 2: preparar el objeto de actualización.
+        // arrange: preparo el objeto tal como lo esperaría el formulario de moodle.
         $updateobj               = $DB->get_record('sqlab', ['id' => $id]);
         $updateobj->name         = 'Nombre modificado por test UNI-02e';
         $updateobj->timemodified = time();
         $updateobj->coursemodule = 0;    // Moodle incluye coursemodule en el objeto update.
         $updateobj->instance     = $id;  // sqlab_update_instance() busca el ID en ->instance (convención de formularios Moodle).
 
-        // Paso 3: llamar a la función bajo test.
+        // act: llamo a la función que quiero probar.
         try {
             $result = sqlab_update_instance($updateobj);
         } catch (\Throwable $e) {
@@ -248,7 +249,7 @@ class mod_sqlab_version_test extends advanced_testcase {
         $this->assertTrue((bool)$result,
             'sqlab_update_instance() debe devolver true. Devolvió: ' . var_export($result, true));
 
-        // Paso 4: verificar que la BD refleja el cambio.
+        // assert: releo de la BD para confirmar que el cambio se ha guardado de verdad.
         $dbrecord = $DB->get_record('sqlab', ['id' => $id]);
         $this->assertEquals(
             'Nombre modificado por test UNI-02e',
@@ -259,13 +260,14 @@ class mod_sqlab_version_test extends advanced_testcase {
     }
 
     /**
-     * UNI-02f [SKIPPED] — sqlab_add_instance() — dependencia arquitectónica.
+     * uni-02f [skipped] — sqlab_add_instance(), no la puedo probar por una limitación de arquitectura.
      *
-     * sqlab_add_instance() requiere que quiz->id esté creado previamente
-     * (según indica el tutor en correo 08/06/2026) y depende de qtype_sqlquestion.
+     * sqlab_add_instance() necesita que quiz->id ya esté creado antes
+     * (esto me lo confirmó el tutor por correo el 08/06/2026) y depende de qtype_sqlquestion,
+     * que no está disponible en el entorno de test.
      *
-     * El comportamiento de escritura en mdl_sqlab se verifica de forma equivalente
-     * mediante UNI-02d y UNI-02e, que usan inserción directa en BD.
+     * el comportamiento de escritura en mdl_sqlab ya lo cubro de forma equivalente
+     * con uni-02d y uni-02e, insertando directo en BD.
      */
     public function test_can_create_sqlab_instance(): void {
         $this->resetAfterTest();
@@ -276,15 +278,15 @@ class mod_sqlab_version_test extends advanced_testcase {
     }
 
     /**
-     * UNI-02g [C] — COMPORTAMIENTO: la configuración del plugin se almacena en config_plugins.
+     * uni-02g [c] — comportamiento: la config del plugin se guarda en config_plugins.
      *
-     * Requisito verificado: Obligatorio — las configuraciones del plugin deben
-     * guardarse en la tabla config_plugins (mediante set_config()/get_config()),
+     * requisito verificado: obligatorio — la configuración del plugin tiene que
+     * guardarse en la tabla config_plugins (vía set_config()/get_config()),
      * y no directamente en la tabla config principal ni en $CFG.
      *
-     * El plugin ya usa get_config('mod_sqlab', 'dbhost') en su lógica real
-     * (véase classes/database_manager.php), por lo que este test confirma que
-     * dicho mecanismo persiste correctamente en config_plugins.
+     * el plugin ya usa get_config('mod_sqlab', 'dbhost') en su lógica real
+     * (mirar classes/database_manager.php), así que este test confirma que
+     * ese mecanismo persiste bien en config_plugins.
      */
     public function test_settings_stored_in_config_plugins(): void {
         global $DB;
@@ -293,18 +295,18 @@ class mod_sqlab_version_test extends advanced_testcase {
         $key   = 'dbhost';
         $value = 'valor_de_prueba_' . uniqid();
 
-        // Paso 1: escribir la configuración mediante la API de Moodle.
+        // act: escribo la config usando la API de moodle, tal como lo haría el plugin.
         set_config($key, $value, 'mod_sqlab');
 
-        // Paso 2: comprobar que get_config() la recupera correctamente.
+        // assert: get_config() tiene que devolver lo mismo que acabo de guardar.
         $this->assertEquals(
             $value,
             get_config('mod_sqlab', $key),
             'get_config(\'mod_sqlab\', \'' . $key . '\') no devolvió el valor esperado.'
         );
 
-        // Paso 3: comprobar directamente en BD que se guardó en config_plugins
-        // (y no en la tabla config principal).
+        // assert: además compruebo directo en BD que cayó en config_plugins
+        // (y no en la tabla config principal, que sería un error).
         $record = $DB->get_record('config_plugins', [
             'plugin' => 'mod_sqlab',
             'name'   => $key,
@@ -323,14 +325,14 @@ class mod_sqlab_version_test extends advanced_testcase {
     }
 
     // =========================================================================
-    // Helper privado
+    // helper privado
     // =========================================================================
 
     /**
-     * Construye el objeto mínimo para insert_record('sqlab', ...).
+     * construyo el objeto mínimo para insert_record('sqlab', ...).
      *
-     * Descubre dinámicamente las columnas NOT NULL para rellenarlas con valores
-     * neutros, haciendo el test compatible con distintas versiones del plugin.
+     * miro dinámicamente qué columnas son NOT NULL y las relleno con valores
+     * neutros, así el test no se rompe si cambia el esquema en otra versión del plugin.
      *
      * @param  int      $courseid ID del curso (necesario para la FK course).
      * @return stdClass           Objeto listo para $DB->insert_record().
@@ -346,7 +348,7 @@ class mod_sqlab_version_test extends advanced_testcase {
         $record->timecreated  = time();
         $record->timemodified = time();
 
-        // Rellenar columnas NOT NULL desconocidas con valores neutros.
+        // relleno las columnas NOT NULL que no conozco con valores neutros según su tipo.
         $columns = $DB->get_columns('sqlab');
         $known   = array_keys((array)$record);
 
